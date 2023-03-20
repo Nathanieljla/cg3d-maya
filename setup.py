@@ -14,7 +14,7 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = 'cg3d_guru'
+NAME = 'cg3d-guru-maya'
 DESCRIPTION = 'My short description for my project.'
 URL = 'https://github.com/Nathanieljla/cg3d-guru-maya'
 EMAIL = 'developer@3dcg.guru'
@@ -107,7 +107,7 @@ setup(
     url=URL,
     #packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
     # If your package is a single module, use this instead of 'packages':
-    py_modules=[NAME],
+    py_modules=['cg3d_guru'],
 
     # entry_points={
     #     'console_scripts': ['mycli=mymodule:cli'],
