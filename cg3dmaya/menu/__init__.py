@@ -1,0 +1,4 @@
+
+PARAMS = {
+    'label':'Guru'
+}

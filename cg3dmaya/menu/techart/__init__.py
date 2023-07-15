@@ -1,0 +1,2 @@
+
+DIVIDER = 'Tect Art'
