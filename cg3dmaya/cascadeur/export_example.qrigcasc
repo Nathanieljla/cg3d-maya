@@ -1,0 +1,1034 @@
+{
+	"Document": [
+		{
+			"Title": "Body",
+			"Sections": [
+				{
+					"Section": "Body",
+					"Names": [
+						{
+							"Bone name": "pelvis",
+							"Joint name": "pelvis",
+							"Joint path": [
+								"root"
+							]
+						},
+						{
+							"Bone name": "stomach",
+							"Joint name": "spine_02",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01"
+							]
+						},
+						{
+							"Bone name": "chest",
+							"Joint name": "spine_04",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03"
+							]
+						},
+						{
+							"Bone name": "neck",
+							"Joint name": "neck_01",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05"
+							]
+						},
+						{
+							"Bone name": "head",
+							"Joint name": "head",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"neck_01",
+								"neck_02"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Left arm",
+					"Names": [
+						{
+							"Bone name": "clavicle_l",
+							"Joint name": "clavicle_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05"
+							]
+						},
+						{
+							"Bone name": "arm_l",
+							"Joint name": "upperarm_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l"
+							]
+						},
+						{
+							"Bone name": "forearm_l",
+							"Joint name": "lowerarm_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l"
+							]
+						},
+						{
+							"Bone name": "hand_l",
+							"Joint name": "hand_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Right arm",
+					"Names": [
+						{
+							"Bone name": "clavicle_r",
+							"Joint name": "clavicle_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05"
+							]
+						},
+						{
+							"Bone name": "arm_r",
+							"Joint name": "upperarm_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r"
+							]
+						},
+						{
+							"Bone name": "forearm_r",
+							"Joint name": "lowerarm_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r"
+							]
+						},
+						{
+							"Bone name": "hand_r",
+							"Joint name": "hand_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Left leg",
+					"Names": [
+						{
+							"Bone name": "thigh_l",
+							"Joint name": "thigh_l",
+							"Joint path": [
+								"root",
+								"pelvis"
+							]
+						},
+						{
+							"Bone name": "calf_l",
+							"Joint name": "calf_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"thigh_l"
+							]
+						},
+						{
+							"Bone name": "foot_l",
+							"Joint name": "foot_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"thigh_l",
+								"calf_l"
+							]
+						},
+						{
+							"Bone name": "toe_l",
+							"Joint name": "ball_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"thigh_l",
+								"calf_l",
+								"foot_l"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Right leg",
+					"Names": [
+						{
+							"Bone name": "thigh_r",
+							"Joint name": "thigh_r",
+							"Joint path": [
+								"root",
+								"pelvis"
+							]
+						},
+						{
+							"Bone name": "calf_r",
+							"Joint name": "calf_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"thigh_r"
+							]
+						},
+						{
+							"Bone name": "foot_r",
+							"Joint name": "foot_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"thigh_r",
+								"calf_r"
+							]
+						},
+						{
+							"Bone name": "toe_r",
+							"Joint name": "ball_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"thigh_r",
+								"calf_r",
+								"foot_r"
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"Title": "Left hand",
+			"Sections": [
+				{
+					"Section": "Thumb",
+					"Names": [
+						{
+							"Bone name": "thumb_l_1",
+							"Joint name": "thumb_01_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l"
+							]
+						},
+						{
+							"Bone name": "thumb_l_2",
+							"Joint name": "thumb_02_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"thumb_01_l"
+							]
+						},
+						{
+							"Bone name": "thumb_l_3",
+							"Joint name": "thumb_03_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"thumb_01_l",
+								"thumb_02_l"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Index finger",
+					"Names": [
+						{
+							"Bone name": "index_finger_l_1",
+							"Joint name": "index_01_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"index_metacarpal_l"
+							]
+						},
+						{
+							"Bone name": "index_finger_l_2",
+							"Joint name": "index_02_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"index_metacarpal_l",
+								"index_01_l"
+							]
+						},
+						{
+							"Bone name": "index_finger_l_3",
+							"Joint name": "index_03_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"index_metacarpal_l",
+								"index_01_l",
+								"index_02_l"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Middle finger",
+					"Names": [
+						{
+							"Bone name": "middle_finger_l_1",
+							"Joint name": "middle_01_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"middle_metacarpal_l"
+							]
+						},
+						{
+							"Bone name": "middle_finger_l_2",
+							"Joint name": "middle_02_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"middle_metacarpal_l",
+								"middle_01_l"
+							]
+						},
+						{
+							"Bone name": "middle_finger_l_3",
+							"Joint name": "middle_03_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"middle_metacarpal_l",
+								"middle_01_l",
+								"middle_02_l"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Ring finger",
+					"Names": [
+						{
+							"Bone name": "ring_finger_l_1",
+							"Joint name": "ring_01_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"ring_metacarpal_l"
+							]
+						},
+						{
+							"Bone name": "ring_finger_l_2",
+							"Joint name": "ring_02_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"ring_metacarpal_l",
+								"ring_01_l"
+							]
+						},
+						{
+							"Bone name": "ring_finger_l_3",
+							"Joint name": "ring_03_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"ring_metacarpal_l",
+								"ring_01_l",
+								"ring_02_l"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Pinky",
+					"Names": [
+						{
+							"Bone name": "pinky_l_1",
+							"Joint name": "pinky_01_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"pinky_metacarpal_l"
+							]
+						},
+						{
+							"Bone name": "pinky_l_2",
+							"Joint name": "pinky_02_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"pinky_metacarpal_l",
+								"pinky_01_l"
+							]
+						},
+						{
+							"Bone name": "pinky_l_3",
+							"Joint name": "pinky_03_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l",
+								"hand_l",
+								"pinky_metacarpal_l",
+								"pinky_01_l",
+								"pinky_02_l"
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"Title": "Right hand",
+			"Sections": [
+				{
+					"Section": "Thumb",
+					"Names": [
+						{
+							"Bone name": "thumb_r_1",
+							"Joint name": "thumb_01_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r"
+							]
+						},
+						{
+							"Bone name": "thumb_r_2",
+							"Joint name": "thumb_02_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"thumb_01_r"
+							]
+						},
+						{
+							"Bone name": "thumb_r_3",
+							"Joint name": "thumb_03_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"thumb_01_r",
+								"thumb_02_r"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Index finger",
+					"Names": [
+						{
+							"Bone name": "index_finger_r_1",
+							"Joint name": "index_01_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"index_metacarpal_r"
+							]
+						},
+						{
+							"Bone name": "index_finger_r_2",
+							"Joint name": "index_02_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"index_metacarpal_r",
+								"index_01_r"
+							]
+						},
+						{
+							"Bone name": "index_finger_r_3",
+							"Joint name": "index_03_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"index_metacarpal_r",
+								"index_01_r",
+								"index_02_r"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Middle finger",
+					"Names": [
+						{
+							"Bone name": "middle_finger_r_1",
+							"Joint name": "middle_01_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"middle_metacarpal_r"
+							]
+						},
+						{
+							"Bone name": "middle_finger_r_2",
+							"Joint name": "middle_02_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"middle_metacarpal_r",
+								"middle_01_r"
+							]
+						},
+						{
+							"Bone name": "middle_finger_r_3",
+							"Joint name": "middle_03_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"middle_metacarpal_r",
+								"middle_01_r",
+								"middle_02_r"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Ring finger",
+					"Names": [
+						{
+							"Bone name": "ring_finger_r_1",
+							"Joint name": "ring_01_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"ring_metacarpal_r"
+							]
+						},
+						{
+							"Bone name": "ring_finger_r_2",
+							"Joint name": "ring_02_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"ring_metacarpal_r",
+								"ring_01_r"
+							]
+						},
+						{
+							"Bone name": "ring_finger_r_3",
+							"Joint name": "ring_03_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"ring_metacarpal_r",
+								"ring_01_r",
+								"ring_02_r"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Pinky",
+					"Names": [
+						{
+							"Bone name": "pinky_r_1",
+							"Joint name": "pinky_01_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"pinky_metacarpal_r"
+							]
+						},
+						{
+							"Bone name": "pinky_r_2",
+							"Joint name": "pinky_02_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"pinky_metacarpal_r",
+								"pinky_01_r"
+							]
+						},
+						{
+							"Bone name": "pinky_r_3",
+							"Joint name": "pinky_03_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r",
+								"hand_r",
+								"pinky_metacarpal_r",
+								"pinky_01_r",
+								"pinky_02_r"
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"Title": "Twist bones",
+			"Sections": [
+				{
+					"Section": "Left arm",
+					"Names": [
+						{
+							"Bone name": "arm_l",
+							"Joint name": "upperarm_twist_01_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l"
+							]
+						},
+						{
+							"Bone name": "forearm_l",
+							"Joint name": "lowerarm_twist_01_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_l",
+								"upperarm_l",
+								"lowerarm_l"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Right arm",
+					"Names": [
+						{
+							"Bone name": "arm_r",
+							"Joint name": "upperarm_twist_01_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r"
+							]
+						},
+						{
+							"Bone name": "forearm_r",
+							"Joint name": "lowerarm_twist_01_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"spine_01",
+								"spine_02",
+								"spine_03",
+								"spine_04",
+								"spine_05",
+								"clavicle_r",
+								"upperarm_r",
+								"lowerarm_r"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Left leg",
+					"Names": [
+						{
+							"Bone name": "thigh_l",
+							"Joint name": "thigh_twist_01_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"thigh_l"
+							]
+						},
+						{
+							"Bone name": "calf_l",
+							"Joint name": "calf_twist_01_l",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"thigh_l",
+								"calf_l"
+							]
+						}
+					]
+				},
+				{
+					"Section": "Right leg",
+					"Names": [
+						{
+							"Bone name": "thigh_r",
+							"Joint name": "thigh_twist_01_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"thigh_r"
+							]
+						},
+						{
+							"Bone name": "calf_r",
+							"Joint name": "calf_twist_01_r",
+							"Joint path": [
+								"root",
+								"pelvis",
+								"thigh_r",
+								"calf_r"
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"Settings": {
+		"Is align pelvis": false,
+		"Is create layers": true
+	}
+}
