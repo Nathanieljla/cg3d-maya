@@ -282,12 +282,6 @@ def _get_joint_struct(key):
         'Joint path': [],
     }    
     
-    #attr = _ACTIVE_CHARACTER_NODE.attr(key)
-    #inputs = attr.inputs()
-    #if not inputs:
-        #return joint_struct
-    
-    #bone = inputs[0]
     
     joint = _get_input_joint(key)
     if joint is None:
@@ -456,6 +450,23 @@ def get_character_root_nodes(character_node):
         
     return roots
 
+
+
+def get_spine_joints(character_node):
+    spine_joints = []
+    spine_names = ['Spine', 'Spine1', 'Spine2', 'Spine3', 'Spine4', 'Spine5',
+                  'Spine6', 'Spine7', 'Spine8', 'Spine9']
+    
+    for spine_name in spine_names:
+        attr = character_node.attr(spine_name)
+        inputs = attr.inputs()
+        if not inputs:
+            return spine_joints
+        else:
+            spine_joints.append(inputs[0])
+            
+    return spine_joints
+        
 
 
 def write_qrig_file(character_node):
