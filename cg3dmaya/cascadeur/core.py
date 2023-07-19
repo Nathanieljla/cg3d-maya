@@ -244,7 +244,7 @@ class QRigData(cg3dguru.user_data.BaseData):
             cg3dguru.user_data.create_attr('rightWeapon', 'message'),
             cg3dguru.user_data.create_attr('alignPelvis', 'bool'),
             cg3dguru.user_data.create_attr('createLayers', 'bool'),
-            cg3dguru.user_data.create_attr('exportExtras', 'message', multi = True),            
+            cg3dguru.user_data.create_attr('exportExtras', 'message', multi = True, indexMatters = False),            
         ]
         
         return attrs

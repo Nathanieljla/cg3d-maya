@@ -3,10 +3,10 @@ import os
 
 import pymel.core as pm
 from PySide2.QtWidgets import *
-from PySide2.QtUiTools import *
-
+#from PySide2.QtUiTools import *
+#from PySide2.QtGui import * 
 #from PySide2.QtCore import * 
-from PySide2.QtUiTools import *
+#from PySide2.QtUiTools import *
 #from PySide2 import __version__
 #from shiboken2 import wrapInstance 
 
@@ -17,11 +17,8 @@ import cg3dmaya.cascadeur.core
 
 WINDOW_NAME = 'HIK Export'
 
-#<class>DropLineEdit</class>
-#<extends>QLineEdit</extends>
-#<header>cg3dmaya/cascadeur/editor.py</header>
-#https://python.hotexamples.com/examples/PySide.QtUiTools/QUiLoader/registerCustomWidget/python-quiloader-registercustomwidget-method-examples.html
-#https://stackoverflow.com/questions/4625102/how-to-replace-a-widget-with-another-using-qt
+#for Designer "PromotTo" you want to put cg3dmaya/cascadeur/editor.py for the header
+#and use QUiLoader.registerCustomWidget(DropLinEdit)
 class DropLineEdit(QLineEdit):
     def __init__(self, *args, **kwargs):
         super(DropLineEdit, self).__init__(*args, **kwargs)
@@ -29,15 +26,31 @@ class DropLineEdit(QLineEdit):
         self.setAcceptDrops(True)
 
     def dragEnterEvent(self, event):
-        event.acceptProposedAction()
-
-    def dropEvent(self, event):
         input_text = event.mimeData().text()
         entries = input_text.split('\n')
         
-        if entries and len(entries) == 1:
-            entries[0]
-            self.setText(entries[0]) #.lstrip('|'))
+        if not entries or len(entries) != 1:
+            return
+        
+        node = pm.PyNode(entries[0])
+        if node.type() != 'joint':
+            return
+        
+        event.acceptProposedAction()
+
+
+    def dropEvent(self, event):
+        input_text = event.mimeData().text()
+        segments = input_text.split('|')
+        
+        try:
+            #This will except when there's a name conflict
+            pm.PyNode(segments[-1])
+            input_text = segments[-1]
+        except:
+            print('Name conflict.  Using long name')
+        
+        self.setText(input_text)
 
 
 
@@ -50,72 +63,123 @@ class HikExportEditor(cg3dguru.ui.Window):
         self.qrig_data = cg3dmaya.cascadeur.core.QRigData()
         self.character_nodes = {}        
         self.spine_joints = {}
+        self.extras = {}
         
+        self.loading_data = False
         self.active_character = None
+        self.rig_data = None
+
         self.init_ui()
         
         #signals
-        self.ui.spine_list.currentTextChanged.connect( self._spine_choice_changed )
-        self.ui.left_weapon_node.textChanged.connect( lambda : self._weapon_changed(self.ui.left_weapon_node, "leftWeapon") )
-        self.ui.right_weapon_node.textChanged.connect( lambda : self._weapon_changed(self.ui.right_weapon_node, "rightWeapon") )
+        self.ui.character_list.currentTextChanged.connect(self.on_character_selected)
+        self.ui.spine_list.currentTextChanged.connect( self.on_spine_choice_changed )
+        self.ui.left_weapon_node.textChanged.connect( lambda : self.on_weapon_changed(self.ui.left_weapon_node, "leftWeapon") )
+        self.ui.right_weapon_node.textChanged.connect( lambda : self.on_weapon_changed(self.ui.right_weapon_node, "rightWeapon") )
+        self.ui.clear_left_weapon.pressed.connect(lambda : self.on_clear_weapon(self.ui.left_weapon_node))
+        self.ui.clear_right_weapon.pressed.connect(lambda : self.on_clear_weapon(self.ui.right_weapon_node))
+        self.ui.add_extras.pressed.connect(self.on_add_extras)
+        self.ui.remove_extras.pressed.connect(self.on_remove_extras)
+        self.ui.align_pelvis.stateChanged.connect(self.on_align_pelvis)
+        self.ui.create_layers.stateChanged.connect(self.on_create_layers)
+        
+    def on_align_pelvis(self, *args):
+        if self.loading_data or not self.active_character:
+            return
+        
+        self.rig_data.alignPelvis.set(args[0] != 0)
+      
+        
+    def on_create_layers(self, *args):
+        if self.loading_data or not self.active_character:
+            return
+        
+        self.rig_data.createLayers.set(args[0] != 0)    
         
         
-    def _weapon_changed(self, control, attr_name):
-        print(attr_name)
-        if not self.active_character:
-            return          
+    def _get_active_character(self):
+        if not self.ui.character_list.currentText():
+            self.active_character = None
+            self.rig_data = None
+        else:
+            self.active_character = self.ui.character_list.currentData()
+            self.rig_data = self.qrig_data.get_data(self.active_character, force_add = True)
+        
+        
+    def on_character_selected(self, *args):
+        if self.loading_data:
+            return
+        
+        self._get_active_character()
+        
+        
+    def on_remove_extras(self):
+        if self.loading_data or not self.active_character:
+            return
+        
+        selected_items = self.ui.extras_list.selectedItems()
+        for item in selected_items:
+            node = self.extras[item.text()]
+            pm.Attribute.disconnect(node.message, self.rig_data.exportExtras, nextAvailable=True)
+            
+        self._init_extras_view()
+        
+        
+    def on_add_extras(self):
+        if self.loading_data or not self.active_character:
+            return              
+        
+        selection = pm.ls(sl=True,type=['transform','objectSet', 'skinCluster'])
+        for selected in selection:
+            if selected.message.isConnectedTo(self.rig_data.exportExtras,
+                                              checkOtherArray=True):
+                continue
+            
+            pm.Attribute.connect(selected.message,
+                                 self.rig_data.exportExtras, nextAvailable=True)
+
+            
+        self._init_extras_view()
+        
+        
+    def on_clear_weapon(self, weapon):
+        weapon.setText('')
+        
+        
+    def on_weapon_changed(self, control, attr_name):
+        if self.loading_data or not self.active_character:
+            return                 
         
         name = control.text()
         if not name:
-            rig_data = self.qrig_data.get_data(self.active_character)
-            #if rig_data:
-                #node.message >> rig_data.leftWeapon
-                
-        try:
-            node = pm.PyNode(name)
-        except:
-            node = None
-     
-        if node:
-            rig_data = self.qrig_data.get_data(self.active_character)
-            if rig_data:
-                attr = rig_data.attr(attr_name)
-                node.message >> attr  
-        
-
-    #def _left_weapon_changed(self, *args):
-        #if not self.active_character:
-            #return          
-        
-        #name = args[0]
-        #if not name:
-            #rig_data = self.qrig_data.get_data(self.active_character)
-            ##if rig_data:
-                ##node.message >> rig_data.leftWeapon
-                
-        #try:
-            #node = pm.PyNode(name)
-        #except:
-            #node = None
-     
-        #if node:
-            #rig_data = self.qrig_data.get_data(self.active_character)
-            #if rig_data:
-                #node.message >> rig_data.leftWeapon
+            if self.rig_data:
+                attr = self.rig_data.attr(attr_name)
+                inputs = attr.inputs(plugs=True)
+                if inputs:
+                    inputs[0] // attr
+            
+        else:    
+            try:
+                node = pm.PyNode(name)
+            except:
+                node = None
+         
+            if node:
+                if self.rig_data:
+                    attr = self.rig_data.attr(attr_name)
+                    node.message >> attr  
 
 
-
-    def _spine_choice_changed(self, *args, **kwargs):
-        if not self.active_character:
-            return
+    def on_spine_choice_changed(self, *args, **kwargs):
+        if self.loading_data or not self.active_character:
+            return        
         
         joint = self.ui.spine_list.currentData()
         if not joint:
             return
         
-        rig_data = self.qrig_data.get_data(self.active_character)
-        if rig_data:
-            joint.message >> rig_data.chestJoint
+        if self.rig_data:
+            joint.message >> self.rig_data.chestJoint
             
         blank_idx = self.ui.spine_list.findText('')
         if blank_idx > -1:
@@ -152,8 +216,6 @@ class HikExportEditor(cg3dguru.ui.Window):
         
     
     def _init_spine_list(self):
-        self.ui.spine_list.blockSignals(True)
-        
         self.spine_joints.clear()
         self.ui.spine_list.clear()
         
@@ -171,8 +233,7 @@ class HikExportEditor(cg3dguru.ui.Window):
         
         #Make an empty entry if the rig_data doesn't reference a valid spine
         #otherwise set the dropdown the matching spine
-        rig_data = self.qrig_data.get_data(self.active_character, force_add = True)
-        inputs = rig_data.chestJoint.inputs()
+        inputs = self.rig_data.chestJoint.inputs()
         valid_spine = None
         if inputs and inputs[0].name() in self.spine_joints:
             valid_spine = inputs[0]
@@ -182,38 +243,63 @@ class HikExportEditor(cg3dguru.ui.Window):
             self.ui.spine_list.setCurrentText('')
         else:
             self.ui.spine_list.setCurrentText(valid_spine.name())
-            
-        self.ui.spine_list.blockSignals(False)
+
         
         
+    def _init_extras_view(self):
+        self.ui.extras_list.clear()
+        self.extras.clear()
+        
+        if not self.active_character:
+            return
+        
+        inputs = self.rig_data.exportExtras.inputs()
+        names = []
+        for node in inputs:
+            name = node.name()
+            names.append(name)
+            self.extras[name] = node
+
+        names.sort()
+        self.ui.extras_list.addItems(names)
+        
+
     def _init_weapon_nodes(self):
-        def set_ui_value(ui_element, value):
-            ui_element.blockSignals(True)
-            ui_element.setText(value)
-            ui_element.blockSignals(False)
-            
-            
-        set_ui_value(self.ui.left_weapon_node, '')
-        set_ui_value(self.ui.right_weapon_node, '')
+        def set_ui_value(ui_element, attr_name):
+            attr = self.rig_data.attr(attr_name)
+            inputs = attr.inputs()
+            if inputs:
+                ui_element.setText(inputs[0].name())
+
+        self.ui.left_weapon_node.setText('')
+        self.ui.right_weapon_node.setText('')
                      
         if not self.active_character:
             return
         
-        rig_data = self.qrig_data.get_data(self.active_character)
-        inputs = rig_data.leftWeapon.inputs()
-        if inputs:
-            set_ui_value(self.ui.left_weapon_node, inputs[0].name().lstrip('|'))
-            
-        inputs = rig_data.rightWeapon.inputs()
-        if inputs:
-            set_ui_value(self.ui.right_Weapon_node, inputs[0].name().lstrip('|'))
+        set_ui_value(self.ui.left_weapon_node, 'leftWeapon')
+        set_ui_value(self.ui.right_weapon_node, 'rightWeapon')
 
         
+    def _init_check_boxes(self):
+        if not self.rig_data:
+            self.ui.align_pelvis.setChecked(False)
+            self.ui.create_layers.setChecked(False)
+        else:
+            self.ui.align_pelvis.setChecked(self.rig_data.alignPelvis.get())
+            self.ui.create_layers.setChecked(self.rig_data.createLayers.get())
+                        
+        
     def init_ui(self):
+        self.loading_data = True
         self._init_character_list()
+        self._get_active_character()
         self._init_spine_list()
         self._init_drag_n_drop()
         self._init_weapon_nodes()
+        self._init_check_boxes()
+        self._init_extras_view()
+        self.loading_data = False
         
         
     def scene_loaded(self):
