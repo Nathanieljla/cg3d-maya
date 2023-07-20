@@ -6,6 +6,9 @@ import os
 import pymel.core as pm
 
 import cg3dguru.user_data
+import cg3dguru.animation.fbx
+
+
 #https://forums.autodesk.com/t5/maya-programming/python-hik/td-p/4262564
 #https://mayastation.typepad.com/maya-station/2011/04/maya-2012-hik-menus-and-mel-commands-part-1.html
 #https://github.com/bungnoid/glTools/blob/master/utils/hik.py
@@ -15,15 +18,17 @@ HIK_ATTRS = {
     'Hips': 'Pelvis',
     'HipsTranslation' : None, 
     'Spine': 'stomach',
-    'Spine1': 'chest',
-    'Spine2': None,
-    'Spine3': None,
-    'Spine4': None,
-    'Spine5': None,
-    'Spine6': None,
-    'Spine7': None,
-    'Spine8': None,
-    'Spine9': None,
+    #anyone of the spine1-9 could be the chest bone.
+    #which is based on the user_data selection
+    'Spine1': 'chest', 
+    'Spine2': 'chest',
+    'Spine3': 'chest',
+    'Spine4': 'chest',
+    'Spine5': 'chest',
+    'Spine6': 'chest',
+    'Spine7': 'chest',
+    'Spine8': 'chest',
+    'Spine9': 'chest',
     'Neck': 'neck',
     'Neck1': None,
     'Neck2': None,
@@ -239,6 +244,7 @@ class QRigData(cg3dguru.user_data.BaseData):
     @staticmethod
     def get_attributes():
         attrs = [
+            cg3dguru.user_data.create_attr('name', 'string'), 
             cg3dguru.user_data.create_attr('chestJoint', 'message'),
             cg3dguru.user_data.create_attr('leftWeapon', 'message'),
             cg3dguru.user_data.create_attr('rightWeapon', 'message'),
@@ -248,6 +254,10 @@ class QRigData(cg3dguru.user_data.BaseData):
         ]
         
         return attrs
+    
+    
+    def post_create(self, data):
+        data.createLayers.set(1)
 
 
 
@@ -314,13 +324,27 @@ def _get_section(section_name, keys, user_data = None):
 def _get_settings_values(user_data):
     if user_data is None:
         return (False, True)
+    
+    return (user_data.alignPelvis.get(), user_data.createLayers.get())
 
 
 def get_qrig_struct(user_data = None):
+    
+    default_spine = 'Spine1'
+    if user_data:
+        spine_joints = get_spine_joints(_ACTIVE_CHARACTER_NODE)
+        if len(spine_joints) > 2:
+            selected_chest_joint = user_data.chestJoint.inputs()[0]
+            for spine_name, joint in spine_joints:
+                if joint == selected_chest_joint:
+                    default_spine = spine_name
+                    print('spine name {}'.format(spine_name))
+    
+    
     body_title = {
         'Title' : 'Body',
         'Sections' :  [
-            _get_section('Body', ['Hips', 'Spine', 'Spine1', 'Neck', 'Head']),
+            _get_section('Body', ['Hips', 'Spine', default_spine, 'Neck', 'Head']),
             _get_section('Left arm', ['LeftShoulder', 'LeftArm', 'LeftForeArm', 'LeftHand']),
             _get_section('Righ arm', ['RightShoulder', 'RightArm', 'RightForeArm', 'RightHand']),
             _get_section('Left leg', ['LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase']),
@@ -360,7 +384,6 @@ def get_qrig_struct(user_data = None):
             ]
     } 
     
-    
     root = {}
     root['Document'] = [body_title, l_hand_title, r_hand_title, twists_title]
     
@@ -381,24 +404,32 @@ def get_root_parent(input_transform):
         return get_root_parent(parent)
     else:
         return input_transform
-
-
-
-
-def get_joint_roots(character_node):
-    """Returns a list of all the hik character joint's top level transforms"""
-    global _ACTIVE_CHARACTER_NODE
-    _ACTIVE_CHARACTER_NODE = character_node
     
-    roots = set()
-    for key in HIK_ATTRS:
-        joint = _get_input_joint(key)
-        if joint:
-            root = get_root_parent(joint)
-            if root not in roots:
-                roots.add(root)
+    
+def add_transform_roots(transform_list, root_set):
+    """Find the top level parent of each item in the list and add it to the set"""
+    for dag in transform_list:
+        root_parent = get_root_parent(dag)
+        if root_parent not in root_set:
+            root_set.add(root_parent)
+
+
+
+
+#def get_joint_roots(character_node):
+    #"""Returns a list of all the hik character joint's top level transforms"""
+    #global _ACTIVE_CHARACTER_NODE
+    #_ACTIVE_CHARACTER_NODE = character_node
+    
+    #roots = set()
+    #for key in HIK_ATTRS:
+        #joint = _get_input_joint(key)
+        #if joint:
+            #root = get_root_parent(joint)
+            #if root not in roots:
+                #roots.add(root)
                 
-    return roots
+    #return roots
             
             
 
@@ -433,26 +464,92 @@ def get_skinned_meshes(character_node):
 
 
 
-def get_character_root_nodes(character_node):
-    """Return a list of all the top level transforms that should be exported
+def get_joint_skin_clusters(joints):
+    """Given a list of joints, return a set of associated skinClusters"""
     
-    Inspect the joints that make up character node definition and find all
-    the top level transform nodes in the scene that need to be exported to an
-    FBX. This will consist of the root of any skinned meshes, joint
-    hierarchies, as well as extra objects included in custom user data.
-    """
-    skinned_meshes = get_skinned_meshes(character_node)
-    roots = get_joint_roots(character_node)
-    
-    for skinned_mesh in skinned_meshes:
-        skin_root = get_root_parent(skinned_mesh)
-        roots.add(skin_root)
+    clusters = set()
+    for joint in joints:
+        world_matrix = joint.attr('worldMatrix')
+        outputs = world_matrix.outputs()
+        for output in outputs:
+            if output.type() == 'skinCluster' and output not in clusters:
+                clusters.add(output)
+                
+    return clusters
+                
+                
+                
+def get_skin_cluster_joints(skin_clusters):
+    """Given a list of skinClusters, return a set of associated joints"""
+    joint_set = set()
+    for skin_cluster in skin_clusters:
+        temp_set = set(skin_cluster.matrix.inputs())
+        joint_set.update(temp_set)
         
-    return roots
+    return joint_set
+
+
+def get_mesh_skin_clusters(meshes):
+    """Given a list of meshes, return a set of associated skinClusters"""
+    clusters = set()
+    for m in meshes:
+        inputs = m.inMesh.inputs()
+        if inputs and isinstance(inputs[0], pm.nodetypes.SkinCluster):
+            clusters.add(inputs[0])
+            
+    return clusters
+
+
+def get_skin_cluster_meshes(skin_clusters):
+    """Given a list of skinClusters, return a set of associated meshes"""
+    meshes = set()
+    for cluster in skin_clusters:
+        output_geo = cluster.attr('outputGeometry')
+        for geo in output_geo.outputs():
+            if geo not in meshes:
+                meshes.add(geo)
+                
+    return meshes
+    
+    
+def get_hik_joints(character_node):
+    """Returns a set containing all the joints used by a character"""
+    
+    global _ACTIVE_CHARACTER_NODE
+    _ACTIVE_CHARACTER_NODE = character_node
+    
+    joints = []
+    for key in HIK_ATTRS:
+        joint = _get_input_joint(key)
+        if joint:
+            joints.append(joint)
+            
+    return set(joints)
+
+
+
+#def get_character_root_nodes(character_node):
+    #"""Return a list of all the top level transforms that should be exported
+    
+    #Inspect the joints that make up character node definition and find all
+    #the top level transform nodes in the scene that need to be exported to an
+    #FBX. This will consist of the root of any skinned meshes, joint
+    #hierarchies, as well as extra objects included in custom user data.
+    #"""
+    #skinned_meshes = get_skinned_meshes(character_node)
+    #roots = get_joint_roots(character_node)
+    
+    #for skinned_mesh in skinned_meshes:
+        #skin_root = get_root_parent(skinned_mesh)
+        #roots.add(skin_root)
+        
+    #return roots
 
 
 
 def get_spine_joints(character_node):
+    """returns a list of (spine_name, joint) that define the HIK spine"""
+    
     spine_joints = []
     spine_names = ['Spine', 'Spine1', 'Spine2', 'Spine3', 'Spine4', 'Spine5',
                   'Spine6', 'Spine7', 'Spine8', 'Spine9']
@@ -463,18 +560,18 @@ def get_spine_joints(character_node):
         if not inputs:
             return spine_joints
         else:
-            spine_joints.append(inputs[0])
+            spine_joints.append((spine_name, inputs[0]))
             
     return spine_joints
         
 
 
-def write_qrig_file(character_node):
+def export_qrig_file(character_node, user_data):
     """Exports the character definition to a qrig file"""
     global _ACTIVE_CHARACTER_NODE
     
     _ACTIVE_CHARACTER_NODE = character_node
-    result = get_qrig_struct(None)
+    result = get_qrig_struct(user_data)
     
     result_string = json.dumps(result, indent=4)
     
@@ -484,6 +581,67 @@ def write_qrig_file(character_node):
     f = open(file_path, "w")
     f.write(result_string)
     f.close()
+
+
+def export(user_data, character_node = None):
+    """Exports an FBX file and optional qrig file"""
+    
+    joints = set()
+    meshes = set()
+    skin_clusters = set()
+    transforms = set()
+    selection_sets = set()
+
+    #organize our exportExtra nodes into types
+    for node in user_data.exportExtras.inputs():
+        if isinstance(node, pm.nodetypes.Joint):
+            joints.add(node)
+        elif isinstance(node, pm.nodetypes.Mesh):
+            meshes.add(node)
+        elif isinstance(node, pm.nodetypes.SelectionSet):
+            selection_sets.add(node)
+        elif isinstance(node, pm.nodetypes.SkinCluster):
+            skin_clusters.add(node)
+        else:
+            transforms.add(node)   
+            
+    #We need to combine all joints and skinned meshes into a set of
+    #skin_clusters, which can then be used to build a complete list
+    #of joints and meshes that need exporting.
+    if character_node:
+        hik_joints = get_hik_joints(character_node)
+        joints.update(hik_joints)
+        
+    mesh_clusters = get_mesh_skin_clusters(meshes)
+    skin_clusters.update(mesh_clusters)
+    
+    joint_skin_clusters = get_joint_skin_clusters(joints)
+    skin_clusters.update(joint_skin_clusters)
+    
+    skinned_joints = get_skin_cluster_joints(skin_clusters)
+    joints.update(skinned_joints)
+    
+    skinned_meshes = get_skin_cluster_meshes(skin_clusters)
+    meshes.update(skinned_meshes)
+    
+    root_transforms = set()
+    add_transform_roots(joints, root_transforms)
+    add_transform_roots(meshes, root_transforms)
+    add_transform_roots(transforms, root_transforms)
+
+    user_selection = pm.ls(sl=True)
+    pm.select(list(root_transforms), replace=True)
+    
+    temp_dir = tempfile.gettempdir()
+    file_path = os.path.join(temp_dir, 'maya_to_casc.fbx')
+    print('FBX location {}'.format(file_path))
+    
+    cg3dguru.animation.fbx.export(filename = file_path)
+    
+    pm.select(user_selection, replace=True)
+    
+    export_qrig_file(character_node, user_data)
+    
 
 
 

@@ -3,12 +3,6 @@ import os
 
 import pymel.core as pm
 from PySide2.QtWidgets import *
-#from PySide2.QtUiTools import *
-#from PySide2.QtGui import * 
-#from PySide2.QtCore import * 
-#from PySide2.QtUiTools import *
-#from PySide2 import __version__
-#from shiboken2 import wrapInstance 
 
 import cg3dmaya
 import cg3dguru.ui
@@ -82,6 +76,14 @@ class HikExportEditor(cg3dguru.ui.Window):
         self.ui.remove_extras.pressed.connect(self.on_remove_extras)
         self.ui.align_pelvis.stateChanged.connect(self.on_align_pelvis)
         self.ui.create_layers.stateChanged.connect(self.on_create_layers)
+        self.ui.export_button.pressed.connect(self.on_export)
+        
+        
+    def on_export(self):
+        if not self.rig_data:
+            return
+        
+        cg3dmaya.cascadeur.core.export(self.rig_data, character_node=self.active_character)
         
     def on_align_pelvis(self, *args):
         if self.loading_data or not self.active_character:
@@ -223,7 +225,7 @@ class HikExportEditor(cg3dguru.ui.Window):
             return
         
         spine_joints = cg3dmaya.cascadeur.core.get_spine_joints(self.active_character)
-        for joint in spine_joints:
+        for spine_name, joint in spine_joints:
             self.spine_joints[joint.name()] = joint
         
         spine_names = list(self.spine_joints)
@@ -330,7 +332,6 @@ class HikExportEditor(cg3dguru.ui.Window):
   
         
 def run():
-
     filepath = os.path.join(cg3dmaya.cascadeur.__path__[0],  'Cascadeur.ui' )
     editor = HikExportEditor(WINDOW_NAME, filepath)
     editor.ui.show()

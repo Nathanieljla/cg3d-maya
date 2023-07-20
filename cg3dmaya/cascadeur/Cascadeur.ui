@@ -268,7 +268,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="export_button">
          <property name="text">
           <string>Export</string>
          </property>
