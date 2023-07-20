@@ -15,7 +15,7 @@ import cg3dguru.animation.fbx
 
 HIK_ATTRS = {
     'Reference': None, 
-    'Hips': 'Pelvis',
+    'Hips': 'pelvis',
     'HipsTranslation' : None, 
     'Spine': 'stomach',
     #anyone of the spine1-9 could be the chest bone.
@@ -292,7 +292,6 @@ def _get_joint_struct(key):
         'Joint path': [],
     }    
     
-    
     joint = _get_input_joint(key)
     if joint is None:
         return joint_struct
@@ -300,7 +299,7 @@ def _get_joint_struct(key):
     parent_list = []
     _get_list_of_parents(joint, parent_list)
     
-    joint_struct['Joint name'] = joint.name()
+    joint_struct['Joint name'] = joint.name().lstrip('|')
     joint_struct['Joint path'] = parent_list
     return joint_struct
     
@@ -346,7 +345,7 @@ def get_qrig_struct(user_data = None):
         'Sections' :  [
             _get_section('Body', ['Hips', 'Spine', default_spine, 'Neck', 'Head']),
             _get_section('Left arm', ['LeftShoulder', 'LeftArm', 'LeftForeArm', 'LeftHand']),
-            _get_section('Righ arm', ['RightShoulder', 'RightArm', 'RightForeArm', 'RightHand']),
+            _get_section('Right arm', ['RightShoulder', 'RightArm', 'RightForeArm', 'RightHand']),
             _get_section('Left leg', ['LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase']),
             _get_section('Right leg', ['RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase']),
             ]
