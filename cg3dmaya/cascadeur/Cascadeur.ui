@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>670</width>
-    <height>691</height>
+    <width>526</width>
+    <height>609</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,13 +16,13 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QGroupBox" name="character_box">
+     <widget class="QGroupBox" name="scene_data_group">
       <property name="title">
-       <string>Pick a character</string>
+       <string>Scene Data</string>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <widget class="QComboBox" name="character_list"/>
+        <widget class="QComboBox" name="scene_list"/>
        </item>
       </layout>
      </widget>
@@ -202,79 +202,63 @@
          </item>
         </layout>
        </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="title">
+       <string>Export Data</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QGroupBox" name="groupBox_3">
-         <property name="title">
-          <string>Additional Exports</string>
+        <widget class="QListWidget" name="extras_list">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QListWidget" name="extras_list">
-            <property name="alternatingRowColors">
-             <bool>true</bool>
-            </property>
-            <property name="selectionMode">
-             <enum>QAbstractItemView::MultiSelection</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <property name="leftMargin">
-             <number>4</number>
-            </property>
-            <property name="topMargin">
-             <number>4</number>
-            </property>
-            <property name="rightMargin">
-             <number>4</number>
-            </property>
-            <property name="bottomMargin">
-             <number>4</number>
-            </property>
-            <item>
-             <widget class="QPushButton" name="add_extras">
-              <property name="text">
-               <string>Add Extras</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="remove_extras">
-              <property name="text">
-               <string>Remove Extras</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::MultiSelection</enum>
+         </property>
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="leftMargin">
+          <number>4</number>
          </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
+         <property name="topMargin">
+          <number>4</number>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>16</width>
-           <height>8</height>
-          </size>
+         <property name="rightMargin">
+          <number>4</number>
          </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="export_button">
-         <property name="text">
-          <string>Export</string>
+         <property name="bottomMargin">
+          <number>4</number>
          </property>
-        </widget>
+         <item>
+          <widget class="QPushButton" name="add_extras">
+           <property name="text">
+            <string>Add Extras</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="remove_extras">
+           <property name="text">
+            <string>Remove Extras</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="export_button">
+      <property name="text">
+       <string>Export</string>
+      </property>
      </widget>
     </item>
    </layout>

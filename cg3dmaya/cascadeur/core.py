@@ -2,11 +2,13 @@
 import json
 import tempfile
 import os
+import winreg
 
 import pymel.core as pm
 
 import cg3dguru.user_data
 import cg3dguru.animation.fbx
+import cg3dguru.utils
 
 
 #https://forums.autodesk.com/t5/maya-programming/python-hik/td-p/4262564
@@ -234,30 +236,44 @@ _ACTIVE_CHARACTER_NODE = None
 _ACTIVE_USER_DATA = None
 
 
-
 class QRigData(cg3dguru.user_data.BaseData):
-    @classmethod
-    def get_prefix(cls):
-        return ''
-    
+    """A block of data to help convert a HIK character to Cascaduer's quick rig"""
     
     @staticmethod
     def get_attributes():
         attrs = [
-            cg3dguru.user_data.create_attr('name', 'string'), 
             cg3dguru.user_data.create_attr('chestJoint', 'message'),
             cg3dguru.user_data.create_attr('leftWeapon', 'message'),
             cg3dguru.user_data.create_attr('rightWeapon', 'message'),
             cg3dguru.user_data.create_attr('alignPelvis', 'bool'),
-            cg3dguru.user_data.create_attr('createLayers', 'bool'),
-            cg3dguru.user_data.create_attr('exportExtras', 'message', multi = True, indexMatters = False),            
+            cg3dguru.user_data.create_attr('createLayers', 'bool'),       
         ]
         
         return attrs
     
-    
     def post_create(self, data):
         data.createLayers.set(1)
+        
+        
+        
+        
+class CascExportData(cg3dguru.user_data.BaseData):
+    """A list for nodes that should always be sent to cascadeur together
+    
+    The CascExportData.exportNodes attribute can store meshes, joints,
+    skinClusters, or selectionSets. Meshes, joints and skinClusters will be
+    inspected to find all dependent joints and meshes. E.g. add a skinCluster
+    and all joints will be exported (as well as the meshes they deform).
+    """
+    
+    @staticmethod
+    def get_attributes():
+        attrs = [
+            cg3dguru.user_data.create_attr('cascName', 'string'), 
+            cg3dguru.user_data.create_attr('exportNodes', 'message', multi = True, indexMatters = False),            
+        ]
+        
+        return attrs    
 
 
 
@@ -462,7 +478,6 @@ def get_skinned_meshes(character_node):
     return results
 
 
-
 def get_joint_skin_clusters(joints):
     """Given a list of joints, return a set of associated skinClusters"""
     
@@ -475,7 +490,6 @@ def get_joint_skin_clusters(joints):
                 clusters.add(output)
                 
     return clusters
-                
                 
                 
 def get_skin_cluster_joints(skin_clusters):
@@ -562,7 +576,26 @@ def get_spine_joints(character_node):
             spine_joints.append((spine_name, inputs[0]))
             
     return spine_joints
-        
+
+
+def get_temp_qrig_filename():
+    temp_dir = tempfile.gettempdir()
+    file_path = os.path.join(temp_dir, 'hik_to_.qrigcasc')
+    
+    return file_path
+
+
+def get_temp_fbx_filename():
+    temp_dir = tempfile.gettempdir()
+    file_path = os.path.join(temp_dir, 'maya_to_casc.fbx')
+    
+    return file_path
+
+def get_temp_commmand_filename():
+    temp_dir = tempfile.gettempdir()
+    file_path = os.path.join(temp_dir, 'temp_casc_commmand.py')
+    
+    return file_path
 
 
 def export_qrig_file(character_node, user_data):
@@ -575,15 +608,45 @@ def export_qrig_file(character_node, user_data):
     result_string = json.dumps(result, indent=4)
     
     temp_dir = tempfile.gettempdir()
-    file_path = os.path.join(temp_dir, 'hik_to_.qrigcasc')
+    file_path = get_temp_qrig_filename()
+    
     print(file_path)
     f = open(file_path, "w")
     f.write(result_string)
     f.close()
+    
+    
+def get_casc_exe_path():
+    casc_path = None
+    try:
+        access_registry = winreg.ConnectRegistry(None,winreg.HKEY_CLASSES_ROOT)
+        access_key = winreg.OpenKey(access_registry, r"Cascadeur\shell\open\command")
+        casc_path = winreg.QueryValue(access_key, None)
+    except Exception as e:
+        print("Couldn't find the EXE in winreg. Let's look at this case! Error:{}".format(e))
+        
+    return casc_path
 
 
-def export(user_data, character_node = None):
+def run_command_in_casc(command_string):
+    file_path =  get_temp_commmand_filename()
+    f = open(file_path, 'w')
+    f.writelines(command_string)
+    f.close()
+    
+    exe_path = get_casc_exe_path()
+    command = '{}&-run&{}'.format(exe_path, file_path)
+    cg3dguru.utils.Commandline.run_shell_command(command.split('&'), 'Communicating with Cascadeur')
+    
+
+
+def export(export_data, qrig_data = None, character_node = None):
     """Exports an FBX file and optional qrig file"""
+    
+    if qrig_data and not character_node:
+        pm.error("cascadeur.core.export: no HIK character node was provided with qrig_data")
+    elif not qrig_data and character_node:
+        pm.error("cascadeur.core.export: qrig_data wasn't provided with HIK Character node")
     
     joints = set()
     meshes = set()
@@ -592,7 +655,7 @@ def export(user_data, character_node = None):
     selection_sets = set()
 
     #organize our exportExtra nodes into types
-    for node in user_data.exportExtras.inputs():
+    for node in export_data.exportExtras.inputs():
         if isinstance(node, pm.nodetypes.Joint):
             joints.add(node)
         elif isinstance(node, pm.nodetypes.Mesh):
@@ -630,24 +693,25 @@ def export(user_data, character_node = None):
 
     user_selection = pm.ls(sl=True)
     pm.select(list(root_transforms), replace=True)
-    
-    temp_dir = tempfile.gettempdir()
-    file_path = os.path.join(temp_dir, 'maya_to_casc.fbx')
+
+    file_path = get_temp_fbx_filename()
     print('FBX location {}'.format(file_path))
     
     cg3dguru.animation.fbx.export(filename = file_path)
     
     pm.select(user_selection, replace=True)
     
-    export_qrig_file(character_node, user_data)
+    export_qrig_file(character_node, qrig_data)
+    
+    
     
 
 
 
-def run():
-    cg3dguru.user_data.editor.run('cg3dmaya.cascadeur.core')
-    #character_definitions = pm.ls(type='HIKCharacterNode')
-    #for character_node in character_definitions:
-        #write_qrig_file(character_node)
+#def run():
+    #cg3dguru.user_data.editor.run('cg3dmaya.cascadeur.core')
+    ##character_definitions = pm.ls(type='HIKCharacterNode')
+    ##for character_node in character_definitions:
+        ##write_qrig_file(character_node)
 
     
