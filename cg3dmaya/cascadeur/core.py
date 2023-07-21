@@ -242,6 +242,7 @@ class QRigData(cg3dguru.user_data.BaseData):
     @staticmethod
     def get_attributes():
         attrs = [
+            cg3dguru.user_data.create_attr('characterNode', 'message'),
             cg3dguru.user_data.create_attr('chestJoint', 'message'),
             cg3dguru.user_data.create_attr('leftWeapon', 'message'),
             cg3dguru.user_data.create_attr('rightWeapon', 'message'),
@@ -655,7 +656,7 @@ def export(export_data, qrig_data = None, character_node = None):
     selection_sets = set()
 
     #organize our exportExtra nodes into types
-    for node in export_data.exportExtras.inputs():
+    for node in export_data.exportNodes.inputs():
         if isinstance(node, pm.nodetypes.Joint):
             joints.add(node)
         elif isinstance(node, pm.nodetypes.Mesh):

@@ -56,20 +56,24 @@ class HikExportEditor(cg3dguru.ui.Window):
         self.add_script_jobs()
         self.qrig_data = cg3dmaya.cascadeur.core.QRigData()
         self.export_data_instance = cg3dmaya.cascadeur.core.CascExportData()
-        self.character_nodes = {}        
+        self.scene_nodes = {}        
         self.spine_joints = {}
         self.extras = {}
         
         self.loading_data = False
-        self.active_character = None
+        self.node_to_select = None
+        self.active_selection = None
         self.rig_data = None
         self.export_data = None
 
+        self._init_drag_n_drop()
         self.init_ui()
         
         #signals
-        self.ui.scene_list.currentTextChanged.connect(self.on_character_selected)
+        self.ui.scene_list.currentTextChanged.connect(self.on_node_selected)
         self.ui.spine_list.currentTextChanged.connect( self.on_spine_choice_changed )
+        self.ui.create_data_button.pressed.connect(self.on_create_data)
+        self.ui.add_hik_button.pressed.connect(self.on_add_hik)
         self.ui.left_weapon_node.textChanged.connect( lambda : self.on_weapon_changed(self.ui.left_weapon_node, "leftWeapon") )
         self.ui.right_weapon_node.textChanged.connect( lambda : self.on_weapon_changed(self.ui.right_weapon_node, "rightWeapon") )
         self.ui.clear_left_weapon.pressed.connect(lambda : self.on_clear_weapon(self.ui.left_weapon_node))
@@ -79,70 +83,104 @@ class HikExportEditor(cg3dguru.ui.Window):
         self.ui.align_pelvis.stateChanged.connect(self.on_align_pelvis)
         self.ui.create_layers.stateChanged.connect(self.on_create_layers)
         self.ui.export_button.pressed.connect(self.on_export)
+                
+                
+                
+    def _create_export_data(self, node = None):
+        if not node:
+            node, data = cg3dmaya.cascadeur.core.CascExportData.create_node(nodeType = 'objectSet')
+        else:
+            self.export_data_instance.add_data(node)
+            
+        return node
+                
+        
+        
+    def on_create_data(self, *args, **kwargs):
+        data_name, ok = QInputDialog.getText(None, "New Node Name", 'Name this data')
+        if ok:
+            new_node = self._create_export_data()
+            pm.rename(new_node, data_name)
+            self.node_to_select = new_node
+            
+        self.init_ui()
+            
+    
+    
+    def on_add_hik(self):
+        
+        pass
         
         
     def on_export(self):
         if not self.export_data:
             return
         
-        cg3dmaya.cascadeur.core.export(self.export_data, qrig_data=self.rig_data, character_node=self.active_character)
+        cg3dmaya.cascadeur.core.export(self.export_data, qrig_data=self.rig_data, character_node=self.active_selection)
         
     def on_align_pelvis(self, *args):
-        if self.loading_data or not self.active_character:
+        if self.loading_data or not self.active_selection:
             return
         
         self.rig_data.alignPelvis.set(args[0] != 0)
       
         
     def on_create_layers(self, *args):
-        if self.loading_data or not self.active_character:
+        if self.loading_data or not self.active_selection:
             return
         
         self.rig_data.createLayers.set(args[0] != 0)    
         
         
-    def _get_active_character(self):
-        if not self.ui.scene_list.currentText():
-            self.active_character = None
-            self.rig_data = None
-            self.export_data = None
-        else:
-            self.active_character = self.ui.scene_list.currentData()
-            self.rig_data = self.qrig_data.get_data(self.active_character, force_add = True)
-            self.export_data = self.export_data_instance.get_data(self.active_character, force_add = True)
+    def _get_active_node(self):
+        self.active_selection = None
+        self.rig_data = None
+        self.export_data = None        
+        
+        if self.ui.scene_list.currentText():
+            self.active_selection = self.ui.scene_list.currentData()
+            self.export_data = self.export_data_instance.get_data(self.active_selection) #, force_add = True)
+            
+            if not self.export_data:
+                pm.error("Casc Editor: Active node somehow doesn't have export data?!?")
+            
+            self.rig_data = self.qrig_data.get_data(self.active_selection) #, force_add = True)
+            
+            
+        self.ui.qrig_data.setVisible(self.rig_data is not None)
         
         
-    def on_character_selected(self, *args):
+    def on_node_selected(self, *args):
         if self.loading_data:
             return
         
-        self._get_active_character()
+        self._get_active_node()
         
         
     def on_remove_extras(self):
-        if self.loading_data or not self.active_character:
+        if self.loading_data or not self.active_selection:
             return
         
         selected_items = self.ui.extras_list.selectedItems()
         for item in selected_items:
             node = self.extras[item.text()]
-            pm.Attribute.disconnect(node.message, self.export_data.exportExtras, nextAvailable=True)
+            pm.Attribute.disconnect(node.message, self.export_data.exportNodes, nextAvailable=True)
             
         self._init_extras_view()
         
         
     def on_add_extras(self):
-        if self.loading_data or not self.active_character:
+        if self.loading_data or not self.active_selection:
             return              
         
         selection = pm.ls(sl=True,type=['transform','objectSet', 'skinCluster'])
         for selected in selection:
-            if selected.message.isConnectedTo(self.export_data.exportExtras,
+            if selected.message.isConnectedTo(self.export_data.exportNodes,
                                               checkOtherArray=True):
                 continue
             
             pm.Attribute.connect(selected.message,
-                                 self.export_data.exportExtras, nextAvailable=True)
+                                 self.export_data.exportNodes, nextAvailable=True)
 
             
         self._init_extras_view()
@@ -153,7 +191,7 @@ class HikExportEditor(cg3dguru.ui.Window):
         
         
     def on_weapon_changed(self, control, attr_name):
-        if self.loading_data or not self.active_character:
+        if self.loading_data or not self.active_selection:
             return                 
         
         name = control.text()
@@ -177,7 +215,7 @@ class HikExportEditor(cg3dguru.ui.Window):
 
 
     def on_spine_choice_changed(self, *args, **kwargs):
-        if self.loading_data or not self.active_character:
+        if self.loading_data or not self.active_selection:
             return        
         
         joint = self.ui.spine_list.currentData()
@@ -198,37 +236,61 @@ class HikExportEditor(cg3dguru.ui.Window):
         self.ui.left_weapon_node.setAcceptDrops(True)
         
         
+    
+    def _get_invalid_characters(self):
+        hik_nodes = pm.ls(type='HIKCharacterNode')
+        valid_nodes = cg3dguru.user_data.Utils.get_nodes_with_data(nodes = hik_nodes, data_class=cg3dmaya.cascadeur.core.CascExportData)
+        hik_nodes = set(hik_nodes)
+        valid_nodes = set(valid_nodes)
+        
+        return hik_nodes.difference(valid_nodes)
+        
+        
         
     def _init_scene_list(self):
-        self.character_nodes.clear()
+        self.scene_nodes.clear()
         self.ui.scene_list.clear()
+            
+        #Find the data in our scene
+        scene_sets = pm.ls(type='objectSet')
+        data_nodes = cg3dguru.user_data.Utils.get_nodes_with_data(scene_sets, data_class=cg3dmaya.cascadeur.core.CascExportData)
+        
+        for node in  data_nodes:
+            self.scene_nodes[node.name()] = node
+            
+            
+        #Build our dropdown list when the names sorted
+        node_names = list(self.scene_nodes)
+        node_names.sort()
+        
+        self.active_selection = None
+        if node_names:
+            for name in node_names:
+                self.ui.scene_list.addItem(name, self.scene_nodes[name])
+            
+            if self.node_to_select:
+                idx = self.ui.scene_list.findText(self.node_to_select.name())
+                self.node_to_select = None
+                if idx > -1:
+                    self.ui.scene_list.setCurrentIndex(idx)
 
-        character_definitions = pm.ls(type='HIKCharacterNode')
-        for character_node in  character_definitions:
-            self.character_nodes[character_node.name()] = character_node
-            
-        character_names = list(self.character_nodes)
-        character_names.sort()
-        
-        self.active_character = None
-        if character_names:
-            for name in character_names:
-                self.ui.scene_list.addItem(name, self.character_nodes[name])
-                
-            self.active_character = self.ui.scene_list.currentData()
-            
-        self.ui.qrig_data.setEnabled(self.active_character is not None)
-                
-        
+            self.active_selection = self.ui.scene_list.currentData()
+             
+                  
+        #let's activate and hide data based on our scene list
+        invalid_nodes = self._get_invalid_characters()
+        self.ui.add_hik_button.setVisible(len(invalid_nodes) > 0)
+        self.ui.selected_data_widget.setEnabled(self.active_selection is not None)
+
     
     def _init_spine_list(self):
         self.spine_joints.clear()
         self.ui.spine_list.clear()
         
-        if not self.active_character:
+        if not self.rig_data:
             return
         
-        spine_joints = cg3dmaya.cascadeur.core.get_spine_joints(self.active_character)
+        spine_joints = cg3dmaya.cascadeur.core.get_spine_joints(self.active_selection)
         for spine_name, joint in spine_joints:
             self.spine_joints[joint.name()] = joint
         
@@ -256,10 +318,10 @@ class HikExportEditor(cg3dguru.ui.Window):
         self.ui.extras_list.clear()
         self.extras.clear()
         
-        if not self.active_character:
+        if not self.active_selection:
             return
         
-        inputs = self.export_data.exportExtras.inputs()
+        inputs = self.export_data.exportNodes.inputs()
         names = []
         for node in inputs:
             name = node.name()
@@ -280,7 +342,7 @@ class HikExportEditor(cg3dguru.ui.Window):
         self.ui.left_weapon_node.setText('')
         self.ui.right_weapon_node.setText('')
                      
-        if not self.active_character:
+        if not self.rig_data:
             return
         
         set_ui_value(self.ui.left_weapon_node, 'leftWeapon')
@@ -299,9 +361,8 @@ class HikExportEditor(cg3dguru.ui.Window):
     def init_ui(self):
         self.loading_data = True
         self._init_scene_list()
-        self._get_active_character()
+        self._get_active_node()
         self._init_spine_list()
-        self._init_drag_n_drop()
         self._init_weapon_nodes()
         self._init_check_boxes()
         self._init_extras_view()
