@@ -2,10 +2,12 @@
 import json
 import tempfile
 import os
+import uuid
 import winreg
 import psutil
 
 import pymel.core as pm
+
 
 import cg3dguru.user_data
 import cg3dguru.animation.fbx
@@ -271,11 +273,15 @@ class CascExportData(cg3dguru.user_data.BaseData):
     @staticmethod
     def get_attributes():
         attrs = [
-            cg3dguru.user_data.create_attr('cascName', 'string'), 
-            cg3dguru.user_data.create_attr('exportNodes', 'message', multi = True, indexMatters = False),            
+            cg3dguru.user_data.create_attr('cscDataId', 'string'),          
         ]
         
-        return attrs    
+        return attrs
+    
+    def post_create(self, data):
+        unique_id = uuid.uuid1()
+        data.cscDataId.set(str(unique_id))
+        data.cscDataId.lock()
 
 
 
@@ -665,6 +671,16 @@ def run_command_in_casc(command_string, *args, **kwargs):
     print(command)
     cg3dguru.utils.Commandline.run_shell_command(command.split('&'), 'Communicating with Cascadeur')
     
+    
+    
+def node_type_exportable(node):
+    if isinstance(node, pm.nodetypes.Joint) \
+       or isinstance(node, pm.nodetypes.Mesh) \
+     or isinstance(node, pm.nodetypes.SkinCluster) \
+     or isinstance(node, pm.nodetypes.Transform):
+        return True
+    
+    return False
 
 
 def export(export_data):
@@ -696,20 +712,19 @@ def export(export_data):
     meshes = set()
     skin_clusters = set()
     transforms = set()
-    selection_sets = set()
 
     #organize our exportExtra nodes into types
-    for node in export_data.exportNodes.inputs():
+    for node in export_data.node().flattened():
         if isinstance(node, pm.nodetypes.Joint):
             joints.add(node)
         elif isinstance(node, pm.nodetypes.Mesh):
             meshes.add(node)
-        elif isinstance(node, pm.nodetypes.SelectionSet):
-            selection_sets.add(node)
         elif isinstance(node, pm.nodetypes.SkinCluster):
             skin_clusters.add(node)
+        elif isinstance(node, pm.nodetypes.Transform):
+            transforms.add(node)
         else:
-            transforms.add(node)   
+            pm.warning('Cascaduer Export: Ignoring object {}'.format(node.name()))
             
     #We need to combine all joints and skinned meshes into a set of
     #skin_clusters, which can then be used to build a complete list
@@ -744,7 +759,8 @@ def export(export_data):
     
     pm.select(user_selection, replace=True)
     
-    export_qrig_file(character_node, qrig_data)
+    if character_node:
+        export_qrig_file(character_node, qrig_data)
     
     run_command_in_casc('commands.guru.import_maya_model', 5, time_of_day = 'midnight')
     

@@ -72,14 +72,14 @@ class HikExportEditor(cg3dguru.ui.Window):
         #signals
         self.ui.scene_list.currentTextChanged.connect(self.on_node_selected)
         self.ui.spine_list.currentTextChanged.connect( self.on_spine_choice_changed )
-        self.ui.create_data_button.pressed.connect(self.on_create_data)
-        self.ui.add_hik_button.pressed.connect(self.on_add_hik)
+        self.ui.create_data_button.released.connect(self.on_create_data)
+        self.ui.add_hik_button.released.connect(self.on_add_hik)
         self.ui.left_weapon_node.textChanged.connect( lambda : self.on_weapon_changed(self.ui.left_weapon_node, "leftWeapon") )
         self.ui.right_weapon_node.textChanged.connect( lambda : self.on_weapon_changed(self.ui.right_weapon_node, "rightWeapon") )
         self.ui.clear_left_weapon.pressed.connect(lambda : self.on_clear_weapon(self.ui.left_weapon_node))
         self.ui.clear_right_weapon.pressed.connect(lambda : self.on_clear_weapon(self.ui.right_weapon_node))
-        self.ui.add_extras.pressed.connect(self.on_add_extras)
-        self.ui.remove_extras.pressed.connect(self.on_remove_extras)
+        self.ui.add_extras.pressed.connect(self.on_add_selection)
+        self.ui.remove_extras.pressed.connect(self.on_remove_selection)
         self.ui.align_pelvis.stateChanged.connect(self.on_align_pelvis)
         self.ui.create_layers.stateChanged.connect(self.on_create_layers)
         self.ui.export_button.pressed.connect(self.on_export)
@@ -175,30 +175,40 @@ class HikExportEditor(cg3dguru.ui.Window):
         self._get_active_node()
         
         
-    def on_remove_extras(self):
-        if self.loading_data or not self.active_selection:
+    def on_remove_selection(self):
+        if self.loading_data or not self.export_data:
             return
         
+        object_set = self.export_data.node()
         selected_items = self.ui.extras_list.selectedItems()
+        nodes_to_remove = []
         for item in selected_items:
             node = self.extras[item.text()]
-            pm.Attribute.disconnect(node.message, self.export_data.exportNodes, nextAvailable=True)
+            nodes_to_remove.append(node)
+            #pm.Attribute.disconnect(node.message, self.export_data.exportNodes, nextAvailable=True)
+            
+        if nodes_to_remove:
+            object_set.removeMembers(nodes_to_remove)
             
         self._init_extras_view()
         
         
-    def on_add_extras(self):
-        if self.loading_data or not self.active_selection:
+    def on_add_selection(self):
+        if self.loading_data or not self.export_data:
             return              
         
-        selection = pm.ls(sl=True,type=['transform','objectSet', 'skinCluster'])
-        for selected in selection:
-            if selected.message.isConnectedTo(self.export_data.exportNodes,
-                                              checkOtherArray=True):
-                continue
+        object_set = self.export_data.node()
+        selection = pm.ls(sl=True,type=['transform','joint', 'skinCluster', 'mesh'])
+        if selection:
+            object_set.addMembers(selection)
+        
+        #for selected in selection:
+            #if selected.message.isConnectedTo(self.export_data.exportNodes,
+                                              #checkOtherArray=True):
+                #continue
             
-            pm.Attribute.connect(selected.message,
-                                 self.export_data.exportNodes, nextAvailable=True)
+            #pm.Attribute.connect(selected.message,
+                                 #self.export_data.exportNodes, nextAvailable=True)
 
             
         self._init_extras_view()
@@ -343,12 +353,13 @@ class HikExportEditor(cg3dguru.ui.Window):
         if not self.active_selection:
             return
         
-        inputs = self.export_data.exportNodes.inputs()
+        object_set = self.export_data.node()
         names = []
-        for node in inputs:
-            name = node.name()
-            names.append(name)
-            self.extras[name] = node
+        
+        for node in object_set.flattened():
+            if cg3dmaya.cascadeur.core.node_type_exportable(node):
+                self.extras[node.name()] = node
+                names.append(node.name())
 
         names.sort()
         self.ui.extras_list.addItems(names)
