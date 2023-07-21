@@ -3,6 +3,7 @@ import json
 import tempfile
 import os
 import winreg
+import psutil
 
 import pymel.core as pm
 
@@ -617,7 +618,8 @@ def export_qrig_file(character_node, user_data):
     f.close()
     
     
-def get_casc_exe_path():
+def get_registered_path():
+    """Find the install path of cascadeur from the registry"""
     casc_path = None
     try:
         access_registry = winreg.ConnectRegistry(None,winreg.HKEY_CLASSES_ROOT)
@@ -629,25 +631,66 @@ def get_casc_exe_path():
     return casc_path
 
 
-def run_command_in_casc(command_string):
-    file_path =  get_temp_commmand_filename()
-    f = open(file_path, 'w')
-    f.writelines(command_string)
-    f.close()
+def get_running_path() -> list:
+    """Find the path of any running instance of cascadeur"""
     
-    exe_path = get_casc_exe_path()
-    command = '{}&-run&{}'.format(exe_path, file_path)
+    #https://stackoverflow.com/questions/67877791/how-could-i-find-the-location-of-a-running-process-using-python
+    
+    ls: list = [] # since many processes can have same name it's better to make list of them
+    for p in psutil.process_iter(['name', 'pid']):
+        if p.info['name'] == 'cascadeur.exe':
+            ls.append(psutil.Process(p.info['pid']).exe())
+            
+    return ls
+
+
+def run_command_in_casc(command_string, *args, **kwargs):
+    if args or kwargs:
+        inputs = [args, kwargs]
+        json_inputs = json.dumps(inputs, indent=4)
+        
+        file_path =  get_temp_commmand_filename()
+        f = open(file_path, 'w')
+        f.writelines(json_inputs)
+        f.close()
+    
+    exe_path = get_running_path()
+    
+    if not exe_path:
+        exe_path = get_registered_path()
+    else:
+        exe_path = exe_path[0]
+        
+    command = '{}&-run-script&{}'.format(exe_path, command_string)
+    print(command)
     cg3dguru.utils.Commandline.run_shell_command(command.split('&'), 'Communicating with Cascadeur')
     
 
 
-def export(export_data, qrig_data = None, character_node = None):
+def export(export_data):
     """Exports an FBX file and optional qrig file"""
     
-    if qrig_data and not character_node:
-        pm.error("cascadeur.core.export: no HIK character node was provided with qrig_data")
-    elif not qrig_data and character_node:
-        pm.error("cascadeur.core.export: qrig_data wasn't provided with HIK Character node")
+    def _delete_file(file_path):
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            
+    
+    qrig_instance = QRigData()
+    qrig_data = qrig_instance.get_data(export_data.node())
+    character_node = None
+    if qrig_data:
+        inputs = qrig_data.characterNode.inputs()
+        if not qrig_data.characterNode.inputs():
+            pm.error("ERROR: cascadeur.core.export: qrig_data wasn't provided with HIK Character node")
+        else:
+            character_node = inputs[0]
+        
+        
+    #delete any existing temp data
+    fbx_file_path = get_temp_fbx_filename()
+    _delete_file(fbx_file_path)
+    _delete_file(get_temp_qrig_filename())
+    _delete_file(get_temp_commmand_filename())
     
     joints = set()
     meshes = set()
@@ -695,14 +738,15 @@ def export(export_data, qrig_data = None, character_node = None):
     user_selection = pm.ls(sl=True)
     pm.select(list(root_transforms), replace=True)
 
-    file_path = get_temp_fbx_filename()
-    print('FBX location {}'.format(file_path))
-    
-    cg3dguru.animation.fbx.export(filename = file_path)
+
+    print('FBX location {}'.format(fbx_file_path))
+    cg3dguru.animation.fbx.export(filename = fbx_file_path)
     
     pm.select(user_selection, replace=True)
     
     export_qrig_file(character_node, qrig_data)
+    
+    run_command_in_casc('commands.guru.import_maya_model', 5, time_of_day = 'midnight')
     
     
     
