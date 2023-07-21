@@ -54,7 +54,7 @@ class HikExportEditor(cg3dguru.ui.Window):
         super(HikExportEditor, self).__init__(windowKey, uiFilepath, custom_widgets = custom_widgets)
         self.job_handlers = {}
         self.add_script_jobs()
-        self.qrig_data = cg3dmaya.cascadeur.core.QRigData()
+        self.qrig_data_instance = cg3dmaya.cascadeur.core.QRigData()
         self.export_data_instance = cg3dmaya.cascadeur.core.CascExportData()
         self.scene_nodes = {}        
         self.spine_joints = {}
@@ -86,12 +86,8 @@ class HikExportEditor(cg3dguru.ui.Window):
                 
                 
                 
-    def _create_export_data(self, node = None):
-        if not node:
-            node, data = cg3dmaya.cascadeur.core.CascExportData.create_node(nodeType = 'objectSet')
-        else:
-            self.export_data_instance.add_data(node)
-            
+    def _create_export_data(self):
+        node, data = cg3dmaya.cascadeur.core.CascExportData.create_node(nodeType = 'objectSet')
         return node
                 
         
@@ -100,16 +96,37 @@ class HikExportEditor(cg3dguru.ui.Window):
         data_name, ok = QInputDialog.getText(None, "New Node Name", 'Name this data')
         if ok:
             new_node = self._create_export_data()
-            pm.rename(new_node, data_name)
-            self.node_to_select = new_node
-            
-        self.init_ui()
+            name = '{}_CSC_EXPORT'.format(data_name)
+            pm.rename(new_node, name)
+            self.node_to_select = new_node 
+            self.init_ui()
             
     
     
     def on_add_hik(self):
+        invalid_nodes = self._get_invalid_characters()
+        if not invalid_nodes:
+            return
         
-        pass
+        names = []
+        nodes = {}
+        for node in invalid_nodes:
+            names.append(node.name())
+            nodes[node.name()] = node
+            
+        names.sort()
+        char_name, ok = QInputDialog.getItem(None, "Select Character", "", names, 0, False)
+        if ok:
+            char_node = nodes[char_name]
+            node = self._create_export_data()
+            name = '{}_CSC_EXPORT'.format(char_node.name())
+            pm.rename(node, name)
+            
+            data = self.qrig_data_instance.add_data(node)
+            char_node.message >> data.characterNode
+            
+            self.node_to_select = node
+            self.init_ui()
         
         
     def on_export(self):
@@ -139,14 +156,14 @@ class HikExportEditor(cg3dguru.ui.Window):
         
         if self.ui.scene_list.currentText():
             self.active_selection = self.ui.scene_list.currentData()
-            self.export_data = self.export_data_instance.get_data(self.active_selection) #, force_add = True)
+            self.export_data = self.export_data_instance.get_data(self.active_selection)
             
             if not self.export_data:
                 pm.error("Casc Editor: Active node somehow doesn't have export data?!?")
             
-            self.rig_data = self.qrig_data.get_data(self.active_selection) #, force_add = True)
+            self.rig_data = self.qrig_data_instance.get_data(self.active_selection)
             
-            
+        #hide some data based on the selected data
         self.ui.qrig_data.setVisible(self.rig_data is not None)
         
         
@@ -258,7 +275,6 @@ class HikExportEditor(cg3dguru.ui.Window):
         for node in  data_nodes:
             self.scene_nodes[node.name()] = node
             
-            
         #Build our dropdown list when the names sorted
         node_names = list(self.scene_nodes)
         node_names.sort()
@@ -275,8 +291,7 @@ class HikExportEditor(cg3dguru.ui.Window):
                     self.ui.scene_list.setCurrentIndex(idx)
 
             self.active_selection = self.ui.scene_list.currentData()
-             
-                  
+                 
         #let's activate and hide data based on our scene list
         invalid_nodes = self._get_invalid_characters()
         self.ui.add_hik_button.setVisible(len(invalid_nodes) > 0)
@@ -285,12 +300,18 @@ class HikExportEditor(cg3dguru.ui.Window):
     
     def _init_spine_list(self):
         self.spine_joints.clear()
-        self.ui.spine_list.clear()
+        self.ui.spine_list.clear
         
-        if not self.rig_data:
+        if not self.rig_data or not self.rig_data.characterNode.inputs():
             return
         
-        spine_joints = cg3dmaya.cascadeur.core.get_spine_joints(self.active_selection)
+        character_node = self.rig_data.characterNode.inputs()
+        if not character_node:
+            return
+        
+        character_node = character_node[0] 
+        
+        spine_joints = cg3dmaya.cascadeur.core.get_spine_joints(character_node)
         for spine_name, joint in spine_joints:
             self.spine_joints[joint.name()] = joint
         
