@@ -241,7 +241,15 @@ _ACTIVE_USER_DATA = None
 
 class QRigData(cg3dguru.user_data.BaseData):
     """A block of data to help convert a HIK character to Cascaduer's quick rig"""
+
+    #@classmethod
+    #def get_class_version(cls):
+        #return (0, 1, 0)
     
+    #@staticmethod
+    #def pre_update_version(*args, **kwargs):
+        #return True
+
     @staticmethod
     def get_attributes():
         attrs = [
@@ -250,15 +258,16 @@ class QRigData(cg3dguru.user_data.BaseData):
             cg3dguru.user_data.create_attr('leftWeapon', 'message'),
             cg3dguru.user_data.create_attr('rightWeapon', 'message'),
             cg3dguru.user_data.create_attr('alignPelvis', 'bool'),
-            cg3dguru.user_data.create_attr('createLayers', 'bool'),       
+            cg3dguru.user_data.create_attr('createLayers', 'bool'),
         ]
         
         return attrs
     
-    def post_create(self, data):
+    @classmethod
+    def post_create(cls, data):
         data.createLayers.set(1)
         
-        
+    
         
         
 class CascExportData(cg3dguru.user_data.BaseData):
@@ -273,12 +282,13 @@ class CascExportData(cg3dguru.user_data.BaseData):
     @staticmethod
     def get_attributes():
         attrs = [
-            cg3dguru.user_data.create_attr('cscDataId', 'string'),          
+            cg3dguru.user_data.create_attr('cscDataId', 'string'),    
         ]
         
         return attrs
     
-    def post_create(self, data):
+    @classmethod
+    def post_create(cls, data):
         unique_id = uuid.uuid1()
         data.cscDataId.set(str(unique_id))
         data.cscDataId.lock()
@@ -437,25 +447,6 @@ def add_transform_roots(transform_list, root_set):
             root_set.add(root_parent)
 
 
-
-
-#def get_joint_roots(character_node):
-    #"""Returns a list of all the hik character joint's top level transforms"""
-    #global _ACTIVE_CHARACTER_NODE
-    #_ACTIVE_CHARACTER_NODE = character_node
-    
-    #roots = set()
-    #for key in HIK_ATTRS:
-        #joint = _get_input_joint(key)
-        #if joint:
-            #root = get_root_parent(joint)
-            #if root not in roots:
-                #roots.add(root)
-                
-    #return roots
-            
-            
-
 def get_skinned_meshes(character_node):
     """return a list of meshes that are deformed by the hik character joints"""
     global _ACTIVE_CHARACTER_NODE
@@ -601,7 +592,7 @@ def get_temp_fbx_filename():
 
 def get_temp_commmand_filename():
     temp_dir = tempfile.gettempdir()
-    file_path = os.path.join(temp_dir, 'temp_casc_commmand.py')
+    file_path = os.path.join(temp_dir, 'csc_command_args.json')
     
     return file_path
 
@@ -652,7 +643,9 @@ def get_running_path() -> list:
 
 def run_command_in_casc(command_string, *args, **kwargs):
     if args or kwargs:
-        inputs = [args, kwargs]
+        inputs = {'args': args,
+                  'kwargs': kwargs
+                  }
         json_inputs = json.dumps(inputs, indent=4)
         
         file_path =  get_temp_commmand_filename()
@@ -683,7 +676,7 @@ def node_type_exportable(node):
     return False
 
 
-def export(export_data):
+def export(export_data, *args, **kwargs):
     """Exports an FBX file and optional qrig file"""
     
     def _delete_file(file_path):
@@ -762,17 +755,5 @@ def export(export_data):
     if character_node:
         export_qrig_file(character_node, qrig_data)
     
-    run_command_in_casc('commands.guru.import_maya_model', 5, time_of_day = 'midnight')
-    
-    
-    
-
-
-
-#def run():
-    #cg3dguru.user_data.editor.run('cg3dmaya.cascadeur.core')
-    ##character_definitions = pm.ls(type='HIKCharacterNode')
-    ##for character_node in character_definitions:
-        ##write_qrig_file(character_node)
-
+    run_command_in_casc('commands.guru.import_maya_model', *args, **kwargs)
     

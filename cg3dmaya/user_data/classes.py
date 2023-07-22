@@ -1,30 +1,30 @@
 
 import cg3dguru.user_data
 
-class HikMap(cg3dguru.user_data.BaseData):
+#class HikMap(cg3dguru.user_data.BaseData):
     
-    @staticmethod
-    def get_suffix():
-        return 'hik'
+    #@staticmethod
+    #def get_suffix():
+        #return 'hik'
     
-    @staticmethod
-    def get_attributes():
+    #@staticmethod
+    #def get_attributes():
         
-        child_attrs = [
-            cg3dguru.user_data.create_attr('name', 'string'), 
-            cg3dguru.user_data.create_attr('age', 'long')
-        ]
+        #child_attrs = [
+            #cg3dguru.user_data.create_attr('name', 'string'), 
+            #cg3dguru.user_data.create_attr('age', 'long')
+        #]
         
-        person : cg3dguru.user_data.Compound = cg3dguru.user_data.create_attr('person', 'compound')
-        for attr in child_attrs:
-            person.add_child(attr)
+        #person : cg3dguru.user_data.Compound = cg3dguru.user_data.create_attr('person', 'compound')
+        #for attr in child_attrs:
+            #person.add_child(attr)
         
-        attrs = [
-            person, 
-            cg3dguru.user_data.create_attr('test', 'string')
-        ]
+        #attrs = [
+            #person, 
+            #cg3dguru.user_data.create_attr('test', 'string')
+        #]
         
-        return attrs
+        #return attrs
     
     
     

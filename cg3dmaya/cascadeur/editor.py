@@ -4,8 +4,9 @@ import os
 import pymel.core as pm
 from PySide2.QtWidgets import *
 
-import cg3dmaya
+
 import cg3dguru.ui
+import cg3dmaya
 import cg3dmaya.cascadeur.core
 
 
@@ -94,12 +95,21 @@ class HikExportEditor(cg3dguru.ui.Window):
         
     def on_create_data(self, *args, **kwargs):
         data_name, ok = QInputDialog.getText(None, "New Node Name", 'Name this data')
-        if ok:
-            new_node = self._create_export_data()
-            name = '{}_CSC_EXPORT'.format(data_name)
-            pm.rename(new_node, name)
-            self.node_to_select = new_node 
-            self.init_ui()
+        if not ok:
+            return
+        
+        selection = pm.ls(sl=True,type=['transform','joint', 'skinCluster', 'mesh'])
+        new_node = self._create_export_data()
+        name = '{}_CSC_EXPORT'.format(data_name)
+        pm.rename(new_node, name)
+        self.node_to_select = new_node
+        
+        answer =  QMessageBox.question(self.mayaWindow, 'Add', 'Add the current selection?')
+        if answer == QMessageBox.StandardButton.Yes:
+            if selection:
+                new_node.addMembers(selection)            
+            
+        self.init_ui()
             
     
     
