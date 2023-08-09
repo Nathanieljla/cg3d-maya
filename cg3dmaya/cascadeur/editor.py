@@ -143,7 +143,7 @@ class HikExportEditor(cg3dguru.ui.Window):
         if not self.export_data:
             return
         
-        cg3dmaya.cascadeur.core.export(self.export_data) #, qrig_data=self.rig_data, character_node=self.active_selection)
+        cg3dmaya.cascadeur.core.export(self.export_data, new_scene=self.ui.new_scene.isChecked()) #, qrig_data=self.rig_data, character_node=self.active_selection)
         
         
     def on_align_pelvis(self, *args):

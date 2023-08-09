@@ -313,7 +313,7 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="new_scene">
          <property name="layoutDirection">
           <enum>Qt::RightToLeft</enum>
          </property>
