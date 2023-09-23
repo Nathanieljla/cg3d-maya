@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>393</width>
-    <height>618</height>
+    <width>576</width>
+    <height>832</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item>
      <widget class="QGroupBox" name="scene_data_group">
       <property name="title">
-       <string>Scene Data</string>
+       <string>Export Sets</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
@@ -45,7 +45,7 @@
          <item>
           <widget class="QPushButton" name="add_hik_button">
            <property name="text">
-            <string>Add to HIK</string>
+            <string>Add HIK</string>
            </property>
           </widget>
          </item>
@@ -53,6 +53,13 @@
           <widget class="QPushButton" name="create_data_button">
            <property name="text">
             <string>Create Data</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="delete_data_button">
+           <property name="text">
+            <string>Delete Data</string>
            </property>
           </widget>
          </item>
@@ -79,7 +86,7 @@
        <item>
         <widget class="QGroupBox" name="qrig_data">
          <property name="title">
-          <string>QRig Data</string>
+          <string>Quick Rig Settings</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
@@ -257,7 +264,7 @@
        <item>
         <widget class="QGroupBox" name="export_data_group">
          <property name="title">
-          <string>Export Nodes</string>
+          <string>Export Content</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>

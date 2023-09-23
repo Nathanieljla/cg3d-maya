@@ -1,4 +1,10 @@
 
 PARAMS = {
-    'label':'Guru'
+    'label': 'Guru'
 }
+
+ORDER = [
+    'cascadeur',
+    'techart',
+    'preferences'
+]

@@ -61,7 +61,8 @@ class HikExportEditor(cg3dguru.ui.Window):
         self.spine_joints = {}
         self.extras = {}
         
-        self.loading_data = False
+        self.loading_data = False #maya scene changed
+        self.selection_changing = False #selection set selection change is occuring
         self.node_to_select = None
         self.active_selection = None
         self.rig_data = None
@@ -74,6 +75,7 @@ class HikExportEditor(cg3dguru.ui.Window):
         self.ui.scene_list.currentTextChanged.connect(self.on_node_selected)
         self.ui.spine_list.currentTextChanged.connect( self.on_spine_choice_changed )
         self.ui.create_data_button.released.connect(self.on_create_data)
+        self.ui.delete_data_button.released.connect(self.on_delete_data)
         self.ui.add_hik_button.released.connect(self.on_add_hik)
         self.ui.left_weapon_node.textChanged.connect( lambda : self.on_weapon_changed(self.ui.left_weapon_node, "leftWeapon") )
         self.ui.right_weapon_node.textChanged.connect( lambda : self.on_weapon_changed(self.ui.right_weapon_node, "rightWeapon") )
@@ -110,7 +112,17 @@ class HikExportEditor(cg3dguru.ui.Window):
                 new_node.addMembers(selection)            
             
         self.init_ui()
-            
+        
+
+    def on_delete_data(self, *args, **kwargs):
+        if not self.active_selection:
+            return
+
+        pm.general.delete(self.active_selection)
+        self.active_selection = None
+        self.init_ui()
+
+
     
     
     def on_add_hik(self):
@@ -147,14 +159,14 @@ class HikExportEditor(cg3dguru.ui.Window):
         
         
     def on_align_pelvis(self, *args):
-        if self.loading_data or not self.active_selection:
+        if self.loading_data or not self.active_selection or self.selection_changing:
             return
         
         self.rig_data.alignPelvis.set(args[0] != 0)
       
         
     def on_create_layers(self, *args):
-        if self.loading_data or not self.active_selection:
+        if self.loading_data or not self.active_selection or self.selection_changing:
             return
         
         self.rig_data.createLayers.set(args[0] != 0)    
@@ -176,17 +188,24 @@ class HikExportEditor(cg3dguru.ui.Window):
             
         #hide some data based on the selected data
         self.ui.qrig_data.setVisible(self.rig_data is not None)
+        self.ui.delete_data_button.setEnabled(self.active_selection is not None)
         
         
     def on_node_selected(self, *args):
         if self.loading_data:
             return
-        
+
+        self.selection_changing = True
         self._get_active_node()
+        self._init_spine_list()
+        self._init_weapon_nodes()
+        self._init_check_boxes()
+        self._init_extras_view()
+        self.selection_changing = False
         
         
     def on_remove_selection(self):
-        if self.loading_data or not self.export_data:
+        if self.loading_data or not self.export_data or self.selection_changing:
             return
         
         object_set = self.export_data.node()
@@ -204,7 +223,7 @@ class HikExportEditor(cg3dguru.ui.Window):
         
         
     def on_add_selection(self):
-        if self.loading_data or not self.export_data:
+        if self.loading_data or not self.export_data or self.selection_changing:
             return              
         
         object_set = self.export_data.node()
@@ -229,7 +248,7 @@ class HikExportEditor(cg3dguru.ui.Window):
         
         
     def on_weapon_changed(self, control, attr_name):
-        if self.loading_data or not self.active_selection:
+        if self.loading_data or not self.active_selection or self.selection_changing:
             return                 
         
         name = control.text()
@@ -253,7 +272,7 @@ class HikExportEditor(cg3dguru.ui.Window):
 
 
     def on_spine_choice_changed(self, *args, **kwargs):
-        if self.loading_data or not self.active_selection:
+        if self.loading_data or not self.active_selection or self.selection_changing:
             return        
         
         joint = self.ui.spine_list.currentData()
@@ -277,11 +296,12 @@ class HikExportEditor(cg3dguru.ui.Window):
     
     def _get_invalid_characters(self):
         hik_nodes = pm.ls(type='HIKCharacterNode')
-        valid_nodes = cg3dguru.user_data.Utils.get_nodes_with_data(nodes = hik_nodes, data_class=cg3dmaya.cascadeur.core.CascExportData)
+        valid_nodes = cg3dguru.user_data.Utils.get_nodes_with_data(nodes=pm.ls(type='objectSet'), data_class=cg3dmaya.cascadeur.core.QRigData)
+        linked_characters = [node.characterNode.get() for node in valid_nodes if node.characterNode.get() is not None]
         hik_nodes = set(hik_nodes)
-        valid_nodes = set(valid_nodes)
+        linked_characters = set(linked_characters)
         
-        return hik_nodes.difference(valid_nodes)
+        return hik_nodes.difference(linked_characters)
         
         
         
@@ -315,13 +335,13 @@ class HikExportEditor(cg3dguru.ui.Window):
                  
         #let's activate and hide data based on our scene list
         invalid_nodes = self._get_invalid_characters()
-        self.ui.add_hik_button.setVisible(len(invalid_nodes) > 0)
+        self.ui.add_hik_button.setEnabled(len(invalid_nodes) > 0)
         self.ui.selected_data_widget.setEnabled(self.active_selection is not None)
 
     
     def _init_spine_list(self):
         self.spine_joints.clear()
-        self.ui.spine_list.clear
+        self.ui.spine_list.clear()
         
         if not self.rig_data or not self.rig_data.characterNode.inputs():
             return
