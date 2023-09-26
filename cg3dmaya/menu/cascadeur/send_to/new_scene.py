@@ -5,5 +5,5 @@ def command(*args, **kwargs):
     
     import wingcarrier.pigeons
     casc = wingcarrier.pigeons.CascadeurPigeon()
-    cmd = u"import cg3dguru.maya; cg3dguru.maya.import_maya(False)"
+    cmd = u"import cg3dguru.maya; cg3dguru.maya.import_scene(True)"
     casc.send_python_command(cmd)

@@ -85,7 +85,8 @@ class HikExportEditor(cg3dguru.ui.Window):
         self.ui.remove_extras.pressed.connect(self.on_remove_selection)
         self.ui.align_pelvis.stateChanged.connect(self.on_align_pelvis)
         self.ui.create_layers.stateChanged.connect(self.on_create_layers)
-        self.ui.export_button.pressed.connect(self.on_export)
+        self.ui.rig_current_button.pressed.connect(lambda: self.on_export(False))
+        self.ui.rig_new_button.pressed.connect(lambda: self.on_export(True))
                 
                 
                 
@@ -151,12 +152,12 @@ class HikExportEditor(cg3dguru.ui.Window):
             self.init_ui()
         
         
-    def on_export(self):
+    def on_export(self, new_scene):
         if not self.export_data:
             return
         
-        cg3dmaya.cascadeur.core.export(self.export_data, new_scene=self.ui.new_scene.isChecked()) #, qrig_data=self.rig_data, character_node=self.active_selection)
-        
+        cg3dmaya.cascadeur.core.export(self.export_data.node(), new_scene) #, qrig_data=self.rig_data, character_node=self.active_selection)
+
         
     def on_align_pelvis(self, *args):
         if self.loading_data or not self.active_selection or self.selection_changing:
@@ -336,7 +337,7 @@ class HikExportEditor(cg3dguru.ui.Window):
         #let's activate and hide data based on our scene list
         invalid_nodes = self._get_invalid_characters()
         self.ui.add_hik_button.setEnabled(len(invalid_nodes) > 0)
-        self.ui.selected_data_widget.setEnabled(self.active_selection is not None)
+        self.ui.selected_data_group.setEnabled(self.active_selection is not None)
 
     
     def _init_spine_list(self):
