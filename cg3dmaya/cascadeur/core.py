@@ -10,6 +10,7 @@ import pathlib
 import pymel.core as pm
 
 
+import wingcarrier.pigeons
 import cg3dguru.user_data
 import cg3dguru.animation.fbx
 import cg3dguru.utils
@@ -539,32 +540,13 @@ def get_hik_joints(character_node):
 
 
 
-#def get_character_root_nodes(character_node):
-    #"""Return a list of all the top level transforms that should be exported
-    
-    #Inspect the joints that make up character node definition and find all
-    #the top level transform nodes in the scene that need to be exported to an
-    #FBX. This will consist of the root of any skinned meshes, joint
-    #hierarchies, as well as extra objects included in custom user data.
-    #"""
-    #skinned_meshes = get_skinned_meshes(character_node)
-    #roots = get_joint_roots(character_node)
-    
-    #for skinned_mesh in skinned_meshes:
-        #skin_root = get_root_parent(skinned_mesh)
-        #roots.add(skin_root)
-        
-    #return roots
-
-
-
 def get_spine_joints(character_node):
     """returns a list of (spine_name, joint) that define the HIK spine"""
-    
+
     spine_joints = []
     spine_names = ['Spine', 'Spine1', 'Spine2', 'Spine3', 'Spine4', 'Spine5',
                   'Spine6', 'Spine7', 'Spine8', 'Spine9']
-    
+
     for spine_name in spine_names:
         attr = character_node.attr(spine_name)
         inputs = attr.inputs()
@@ -572,37 +554,17 @@ def get_spine_joints(character_node):
             return spine_joints
         else:
             spine_joints.append((spine_name, inputs[0]))
-            
+
     return spine_joints
-
-
-#def get_temp_qrig_filename():
-    #temp_dir = tempfile.gettempdir()
-    #file_path = os.path.join(temp_dir, 'hik_to_.qrigcasc')
-    
-    #return file_path
-
-
-#def get_temp_fbx_filename():
-    #temp_dir = tempfile.gettempdir()
-    #file_path = os.path.join(temp_dir, 'maya_to_casc.fbx')
-    
-    #return file_path
-
-#def get_temp_commmand_filename():
-    #temp_dir = tempfile.gettempdir()
-    #file_path = os.path.join(temp_dir, 'csc_command_args.json')
-    
-    #return file_path
 
 
 def export_qrig_file(character_node, qrig_data, filename):
     """Exports the character definition to a qrig file"""
     global _ACTIVE_CHARACTER_NODE
-    
+
     _ACTIVE_CHARACTER_NODE = character_node
     result = get_qrig_struct(qrig_data)
-    
+
     result_string = json.dumps(result, indent=4)
 
     print('QRig File: {}'.format(filename))
@@ -611,71 +573,8 @@ def export_qrig_file(character_node, qrig_data, filename):
     f.close()
 
     return filename
-    
-    
-#def get_registered_path():
-    #"""Find the install path of cascadeur from the registry"""
-    #casc_path = None
-    #try:
-        #access_registry = winreg.ConnectRegistry(None,winreg.HKEY_CLASSES_ROOT)
-        #access_key = winreg.OpenKey(access_registry, r"Cascadeur\shell\open\command")
-        #casc_path = winreg.QueryValue(access_key, None)
-    #except Exception as e:
-        #print("Couldn't find the EXE in winreg. Let's look at this case! Error:{}".format(e))
-        
-    #return casc_path
 
 
-#def get_running_path() -> list:
-    #"""Find the path of any running instance of cascadeur"""
-    
-    ##https://stackoverflow.com/questions/67877791/how-could-i-find-the-location-of-a-running-process-using-python
-    
-    #ls: list = [] # since many processes can have same name it's better to make list of them
-    #for p in psutil.process_iter(['name', 'pid']):
-        #if p.info['name'] == 'cascadeur.exe':
-            #ls.append(psutil.Process(p.info['pid']).exe())
-            
-    #return ls
-
-
-#def run_command_in_casc(command_string, *args, **kwargs):
-    #if args or kwargs:
-        #inputs = {'args': args,
-                  #'kwargs': kwargs
-                  #}
-        #json_inputs = json.dumps(inputs, indent=4)
-        
-        #file_path =  get_temp_commmand_filename()
-        #f = open(file_path, 'w')
-        #f.writelines(json_inputs)
-        #f.close()
-    
-    #exe_path = get_running_path()
-    
-    #if not exe_path:
-        #exe_path = get_registered_path()
-    #else:
-        #exe_path = exe_path[0]
-        
-    #command = '{}&-run-script&{}'.format(exe_path, command_string)
-    #print(command)
-    #cg3dguru.utils.Commandline.run_shell_command(command.split('&'), 'Communicating with Cascadeur')
-    
-
-#def run_command_in_casc(command_string):
-    #exe_path = get_running_path()
-    #if not exe_path:
-        #exe_path = get_registered_path()
-    #else:
-        #exe_path = exe_path[0]
-
-    #command = '{}&--run-python-code&{}'.format(exe_path, command_string)
-    #print(command)
-    #cg3dguru.utils.Commandline.run_shell_command(command.split('&'), 'Communicating with Cascadeur')
-
-    
-    
 def node_type_exportable(node):
     if isinstance(node, pm.nodetypes.Joint) \
        or isinstance(node, pm.nodetypes.Mesh) \
@@ -686,93 +585,6 @@ def node_type_exportable(node):
     return False
 
 
-#def export(export_data, new_scene): #, *args, **kwargs):
-    #"""Exports an FBX file and optional qrig file"""
-    
-    #def _delete_file(file_path):
-        #if os.path.exists(file_path):
-            #os.remove(file_path)
-            
-    
-    #qrig_instance = QRigData()
-    #qrig_data = qrig_instance.get_data(export_data.node())
-    #character_node = None
-    #if qrig_data:
-        #inputs = qrig_data.characterNode.inputs()
-        #if not qrig_data.characterNode.inputs():
-            #pm.error("ERROR: cascadeur.core.export: qrig_data wasn't provided with HIK Character node")
-        #else:
-            #character_node = inputs[0]
-        
-        
-    ##delete any existing temp data
-    #fbx_file_path = get_temp_fbx_filename()
-    #_delete_file(fbx_file_path)
-    #_delete_file(get_temp_qrig_filename())
-    #_delete_file(get_temp_commmand_filename())
-    
-    #joints = set()
-    #meshes = set()
-    #skin_clusters = set()
-    #transforms = set()
-
-    ##organize our exportExtra nodes into types
-    #for node in export_data.node().flattened():
-        #if isinstance(node, pm.nodetypes.Joint):
-            #joints.add(node)
-        #elif isinstance(node, pm.nodetypes.Mesh):
-            #meshes.add(node)
-        #elif isinstance(node, pm.nodetypes.SkinCluster):
-            #skin_clusters.add(node)
-        #elif isinstance(node, pm.nodetypes.Transform):
-            #transforms.add(node)
-        #else:
-            #pm.warning('Cascaduer Export: Ignoring object {}'.format(node.name()))
-            
-    ##We need to combine all joints and skinned meshes into a set of
-    ##skin_clusters, which can then be used to build a complete list
-    ##of joints and meshes that need exporting.
-    #if character_node:
-        #hik_joints = get_hik_joints(character_node)
-        #joints.update(hik_joints)
-        
-    #mesh_clusters = get_mesh_skin_clusters(meshes)
-    #skin_clusters.update(mesh_clusters)
-    
-    #joint_skin_clusters = get_joint_skin_clusters(joints)
-    #skin_clusters.update(joint_skin_clusters)
-    
-    #skinned_joints = get_skin_cluster_joints(skin_clusters)
-    #joints.update(skinned_joints)
-    
-    #skinned_meshes = get_skin_cluster_meshes(skin_clusters)
-    #meshes.update(skinned_meshes)
-    
-    #root_transforms = set()
-    #add_transform_roots(joints, root_transforms)
-    #add_transform_roots(meshes, root_transforms)
-    #add_transform_roots(transforms, root_transforms)
-
-    #user_selection = pm.ls(sl=True)
-    #pm.select(list(root_transforms), replace=True)
-
-
-    #print('FBX location {}'.format(fbx_file_path))
-    #cg3dguru.animation.fbx.export(filename = fbx_file_path)
-    
-    #pm.select(user_selection, replace=True)
-
-    #qrig_file_path = ''
-    #if character_node:
-        #qrig_file_path = export_qrig_file(character_node, qrig_data)
-
-    #cmd = 'import cg3dguru.maya; cg3dguru.maya.import_maya_scene(r"{}", r"{}", {})'.format(fbx_file_path, qrig_file_path, new_scene)
-    ##cmd = "print('hi')"
-    #run_command_in_casc(cmd)
-    ##run_command_in_casc('commands.guru.import_maya_model', *args, **kwargs)
-    
-    
-    
 
 def _export_data(export_data, export_folder: pathlib.Path, export_rig: bool):
     qrig_data = QRigData.get_data(export_data.node())
@@ -846,6 +658,14 @@ def _export_data(export_data, export_folder: pathlib.Path, export_rig: bool):
 
 
 
+def _build_default_set():
+    export_node, data = CascExportData.create_node(nodeType='objectSet')
+    export_node.addMembers(pm.ls(assemblies=True))
+    pm.rename(export_node, 'CACS_EXPORT')
+    return export_node
+
+
+
 def export(export_set=None, export_rig=False):
     #remove any previous exports
     temp_dir = pathlib.Path(os.path.join(tempfile.gettempdir(), 'mayacasc'))
@@ -865,9 +685,48 @@ def export(export_set=None, export_rig=False):
             pm.ls(sl=True, type='objectSet')
         
         export_nodes = cg3dguru.user_data.Utils.get_nodes_with_data(scene_sets, data_class=CascExportData)
+        if not export_nodes:
+            #There's nothing to export in the scene, so let's build a default set.
+            export_nodes = [_build_default_set()]
+            
         
     for node in export_nodes:
         _export_data(node, temp_dir, export_rig)
+        
+
+def update_animations():
+    export()
+    casc = wingcarrier.pigeons.CascadeurPigeon()
+    cmd = u"import cg3dguru.maya; cg3dguru.maya.update_animations()"
+    casc.send_python_command(cmd)
     
     
+def update_models():
+    export()
+    casc = wingcarrier.pigeons.CascadeurPigeon()
+    cmd = u"import cg3dguru.maya; cg3dguru.maya.update_models()"
+    casc.send_python_command(cmd)
+    
+    
+def export_scene(new_scene):
+    export()
+    casc = wingcarrier.pigeons.CascadeurPigeon()
+    cmd = u"import cg3dguru.maya; cg3dguru.maya.import_scene({})".format(new_scene)
+    casc.send_python_command(cmd)
+    
+
+def export_rig(new_scene, export_set):
+    export(export_set, True)
+    casc = wingcarrier.pigeons.CascadeurPigeon()
+    cmd = u"import cg3dguru.maya; cg3dguru.maya.smart_import({})".format(new_scene)
+    casc.send_python_command(cmd)
+    
+    
+def smart_export():
+    export()
+    casc = wingcarrier.pigeons.CascadeurPigeon()
+    cmd = u"import cg3dguru.maya; cg3dguru.maya.smart_import({})".format(False)
+    casc.send_python_command(cmd)    
+
+
     

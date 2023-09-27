@@ -124,8 +124,6 @@ class HikExportEditor(cg3dguru.ui.Window):
         self.init_ui()
 
 
-    
-    
     def on_add_hik(self):
         invalid_nodes = self._get_invalid_characters()
         if not invalid_nodes:
@@ -156,7 +154,7 @@ class HikExportEditor(cg3dguru.ui.Window):
         if not self.export_data:
             return
         
-        cg3dmaya.cascadeur.core.export(self.export_data.node(), new_scene) #, qrig_data=self.rig_data, character_node=self.active_selection)
+        cg3dmaya.cascadeur.core.export_rig(new_scene, self.export_data.node()) #, qrig_data=self.rig_data, character_node=self.active_selection)
 
         
     def on_align_pelvis(self, *args):
