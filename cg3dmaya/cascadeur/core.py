@@ -666,7 +666,7 @@ def _build_default_set():
 
 
 
-def export(export_set=None, export_rig=False):
+def export(export_set=None, export_rig=False, cmd_string=''):
     #remove any previous exports
     temp_dir = pathlib.Path(os.path.join(tempfile.gettempdir(), 'mayacasc'))
     print('Cascaduer Export Location {}'.format(temp_dir))
@@ -688,45 +688,65 @@ def export(export_set=None, export_rig=False):
         if not export_nodes:
             #There's nothing to export in the scene, so let's build a default set.
             export_nodes = [_build_default_set()]
-            
-        
+              
     for node in export_nodes:
         _export_data(node, temp_dir, export_rig)
         
 
+    if cmd_string:
+        casc = wingcarrier.pigeons.CascadeurPigeon()
+        casc.send_python_command(cmd_string)
+        
+
 def update_animations():
-    export()
-    casc = wingcarrier.pigeons.CascadeurPigeon()
-    cmd = u"import cg3dguru.maya; cg3dguru.maya.update_animations()"
-    casc.send_python_command(cmd)
+    export(cmd_string=u"import cg3dguru.maya; cg3dguru.maya.update_animations()")
+    #casc = wingcarrier.pigeons.CascadeurPigeon()
+    #cmd = u"import cg3dguru.maya; cg3dguru.maya.update_animations()"
+    #casc.send_python_command(cmd)
     
     
 def update_models():
-    export()
-    casc = wingcarrier.pigeons.CascadeurPigeon()
-    cmd = u"import cg3dguru.maya; cg3dguru.maya.update_models()"
-    casc.send_python_command(cmd)
+    export(cmd_string=u"import cg3dguru.maya; cg3dguru.maya.update_models()")
+    #casc = wingcarrier.pigeons.CascadeurPigeon()
+    #cmd = u"import cg3dguru.maya; cg3dguru.maya.update_models()"
+    #casc.send_python_command(cmd)
     
     
 def export_scene(new_scene):
-    export()
-    casc = wingcarrier.pigeons.CascadeurPigeon()
     cmd = u"import cg3dguru.maya; cg3dguru.maya.import_scene({})".format(new_scene)
-    casc.send_python_command(cmd)
+    export(cmd_string=cmd)
+    #casc = wingcarrier.pigeons.CascadeurPigeon()
+    #cmd = u"import cg3dguru.maya; cg3dguru.maya.import_scene({})".format(new_scene)
+    #casc.send_python_command(cmd)
     
 
 def export_rig(new_scene, export_set):
-    export(export_set, True)
-    casc = wingcarrier.pigeons.CascadeurPigeon()
-    cmd = u"import cg3dguru.maya; cg3dguru.maya.smart_import({})".format(new_scene)
-    casc.send_python_command(cmd)
+    cmd = u"import cg3dguru.maya; cg3dguru.maya.import_scene({})".format(new_scene)
+    export(export_set, True, cmd_string=cmd)
+    #casc = wingcarrier.pigeons.CascadeurPigeon()
+    #cmd = u"import cg3dguru.maya; cg3dguru.maya.smart_import({})".format(new_scene)
+    #casc.send_python_command(cmd)
     
     
 def smart_export():
-    export()
-    casc = wingcarrier.pigeons.CascadeurPigeon()
     cmd = u"import cg3dguru.maya; cg3dguru.maya.smart_import({})".format(False)
-    casc.send_python_command(cmd)    
+    export(cmd_string=cmd)
+    #casc = wingcarrier.pigeons.CascadeurPigeon()
+    #cmd = u"import cg3dguru.maya; cg3dguru.maya.smart_import({})".format(False)
+    #casc.send_python_command(cmd)    
 
 
+def import_fbx():
+    temp_dir = pathlib.Path(os.path.join(tempfile.gettempdir(), 'mayacasc'))
+    print('Cascaduer Export Location {}'.format(temp_dir))
+    if not temp_dir.exists():
+        print('Nothing to import')
+        return
+    
+    for child in temp_dir.iterdir():
+        cg3dguru.animation.fbx.import_fbx(str(child))
+        
+        
+def run():
+    import_fbx()
     
