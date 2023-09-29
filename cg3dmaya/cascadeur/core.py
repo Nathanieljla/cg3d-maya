@@ -643,8 +643,9 @@ def _export_data(export_data, export_folder: pathlib.Path, export_rig: bool):
     
 
     file_id = export_data.cscDataId.get()
-    name = '{}.{}.fbx'.format(export_data.node().name(), file_id)
-    fbx_file_path = export_folder.joinpath(name)
+    node_name = export_data.node().name().split(':')[-1]
+    filename = '{}.{}.fbx'.format(node_name, file_id)
+    fbx_file_path = export_folder.joinpath(filename)
     print('FBX file: {}'.format(fbx_file_path))
     cg3dguru.animation.fbx.export(filename = fbx_file_path)
     
@@ -652,8 +653,8 @@ def _export_data(export_data, export_folder: pathlib.Path, export_rig: bool):
 
     qrig_file_path = ''
     if export_rig and character_node:
-        name = '{}.{}.qrigcasc'.format(export_data.node().name(), file_id)
-        qrig_file_path = export_folder.joinpath(name)
+        filename = '{}.{}.qrigcasc'.format(node_name, file_id)
+        qrig_file_path = export_folder.joinpath(filename)
         export_qrig_file(character_node, qrig_data, qrig_file_path)
 
 
@@ -682,7 +683,7 @@ def export(export_set=None, export_rig=False, cmd_string=''):
     else:   
         scene_sets = pm.ls(sl=True, type='objectSet')
         if not scene_sets:
-            pm.ls(sl=True, type='objectSet')
+            scene_sets = pm.ls(type='objectSet')
         
         export_nodes = cg3dguru.user_data.Utils.get_nodes_with_data(scene_sets, data_class=CascExportData)
         if not export_nodes:
@@ -736,15 +737,65 @@ def smart_export():
     #casc.send_python_command(cmd)    
 
 
-def import_fbx():
+def get_import_files():
+    files = {}
+
     temp_dir = pathlib.Path(os.path.join(tempfile.gettempdir(), 'mayacasc'))
-    print('Cascaduer Export Location {}'.format(temp_dir))
     if not temp_dir.exists():
-        print('Nothing to import')
-        return
-    
+        pm.error("Can't find Maya data")
+        return files
+
     for child in temp_dir.iterdir():
-        cg3dguru.animation.fbx.import_fbx(str(child))
+        name, ext = child.name.rsplit('.', 1)
+        if name not in files:
+            files[name] = dict()
+            
+        files[name][ext.lower()] = str(child)
+        
+        
+    return files
+
+
+
+def import_fbx():
+    files = get_import_files()
+    
+    scene_sets = pm.ls(type='objectSet')
+    existing_exports = cg3dguru.user_data.Utils.get_nodes_with_data(scene_sets, data_class=CascExportData)
+    scene_roots = set(pm.ls(assemblies=True))
+
+    for key, item in files.items():
+        fbx_path = item.get('fbx', '')
+        qrig_path = item.get('qrigcasc', '')    
+
+        set_name, maya_id = key.split('.')
+        if fbx_path:
+            cg3dguru.animation.fbx.import_fbx(fbx_path)
+            current_roots = set(pm.ls(assemblies=True))
+
+            matching_export = None
+            for node in existing_exports:
+                if node.maya_id.get() == maya_id:
+                    matching_export = node
+                    break
+
+            #should we always update with the latest roots?
+            new_roots = current_roots.difference(scene_roots)
+            scene_roots = current_roots
+            
+            if matching_export is None:
+                new_node, data = CascExportData.create_node(nodeType='objectSet')
+                new_node.addMembers(new_roots)
+                pm.rename(new_node, set_name)
+                
+                data.cscDataId.unlock()
+                data.cscDataId.set(maya_id)
+                data.cscDataId.lock()                
+                
+                
+        if qrig_path:
+            print("Can't import rigs at the moment")
+            
         
         
 def run():
