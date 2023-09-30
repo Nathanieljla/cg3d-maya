@@ -1,4 +1,4 @@
-import cg3dguru.user_data.editor
+import cg3dguru.udata.editor
 
 def command(*args, **kwargs):
-    cg3dguru.user_data.editor.run(data_module = 'cg3dmaya.user_data.classes')
+    cg3dguru.udata.editor.run(data_module='cg3dmaya.user_data.classes')

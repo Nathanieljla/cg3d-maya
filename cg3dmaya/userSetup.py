@@ -1,7 +1,6 @@
 import maya.cmds as cmds
 import maya.utils
 
-import cg3dmaya.scriptjobs
 
 def guru_setup():
     print("Guru: building Menu!")

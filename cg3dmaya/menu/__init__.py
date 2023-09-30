@@ -4,7 +4,6 @@ PARAMS = {
 }
 
 ORDER = [
-    'cascadeur',
     'techart',
     'preferences'
 ]
