@@ -1,6 +1,6 @@
 DIVIDER = ''
 
 def command(*args, **kwargs):
-    print(*args)
-    print("Fake Baking Animation")
+    import cg3dmaya.preferences.editor
+    cg3dmaya.preferences.editor.run()
 

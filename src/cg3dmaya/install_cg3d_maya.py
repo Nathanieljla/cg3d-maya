@@ -6,16 +6,19 @@ https://github.com/Nathanieljla/cg3d-maya-core/blob/main/src/cg3dguru/utils/drop
 
 If you want to modify this script for your own purposes it's better
 to pull a copy from the source location.
+
+changes:
+v0.9.2 : post_install now receives bool on if main install was successful
 """
 
 __author__ = "Nathaniel Albright"
 __email__ = "developer@3dcg.guru"
 
-VERSION = (0, 9, 0)
+VERSION = (0, 9, 2)
 __version__ = '.'.join(map(str, VERSION))
 
 
-
+import pathlib
 import os
 import re
 import time
@@ -704,10 +707,7 @@ class ModuleManager(QThread):
         except OSError:
             return False
 
-        filename = os.path.join(self.install_root, (self.module_name + '.mod'))
-        self.read_module_definitions(filename)
-              
-        return self.update_module_definition(filename)
+        return True
     
 
     def install(self):
@@ -724,18 +724,33 @@ class ModuleManager(QThread):
         return installed
     
     
-    def post_install(self):
+    def post_install(self, install_succeeded: bool):
         """Used after install() to do any clean-up
-
-        """  
+        
+        This function also updates/adds the .mod file.
+        Sub-classes should call this function when overriding.
+        
+        Returns:
+        --------
+        bool
+            True if all post install operations executed as expected
+        """
+        
         print('post install')
-        if self.install_succeeded:
+        if install_succeeded:
             if self.scripts_path not in sys.path:
                 sys.path.append(self.scripts_path)
                 print('Add scripts path [{}] to system paths'.format(self.scripts_path))
             else:
                 print('scripts path in system paths')
                 
+                filename = os.path.join(self.install_root, (self.module_name + '.mod'))
+                self.read_module_definitions(filename)
+                      
+                return self.update_module_definition(filename)
+                        
+        return True
+
                 
     def install_pymel(self):
         """Installs pymel to a common Maya location"""
@@ -979,6 +994,7 @@ class InstallerUi(QWidget):
         self.animated_gif.show()
         self.message_label.setText(self.installing_message)
         self.message_label.show()
+        self.repaint()
         
         if self.module_manager.pre_install():
             self.connect(self.module_manager, SIGNAL('finished()'), self.done)
@@ -997,7 +1013,7 @@ class InstallerUi(QWidget):
         else:
             self.message_label.setText(self.failed_message)
         
-        no_errors = self.module_manager.post_install()
+        no_errors = self.module_manager.post_install(self.module_manager.install_succeeded)
         if not no_errors:
             self.message_label.setText(self.post_error_messsage)
     
@@ -1019,22 +1035,70 @@ class MyInstaller(ModuleManager):
     def __init__(self, *args, **kwargs):
         super(MyInstaller, self).__init__(*args, **kwargs)
 
-        
     def get_remote_package(self):
         """Users must override this with pypi name or github address"""
         return r'https://github.com/Nathanieljla/cg3d-maya/archive/refs/heads/main.zip'
-    
-    
+
     def install(self):
         installed = super(MyInstaller, self).install()
         if installed:
-            pip_args = [r'--target={0}'.format(self.my_data_dir)]
+            pip_args = [r'--target={0}'.format(self.scripts_path)]
             #install fspy
             Commandline.pip_install('https://github.com/Nathanieljla/fSpy-Maya/archive/refs/heads/main.zip', pip_args=pip_args)
 
             return True
         else:
             return False
+        
+        
+    def _add_fspy_plugin(self):
+        #copy the fspy
+        fspy_plugin = pathlib.Path(self.scripts_path).joinpath('fspy_maya/fspy_plugin.py')
+        dest = pathlib.Path(self.plugins_path).joinpath(fspy_plugin.name)
+        if dest.exists():
+            dest.unlink()
+            
+        shutil.copyfile(fspy_plugin, dest)
+
+        if self.plugins_path not in os.environ['MAYA_PLUG_IN_PATH']:
+            print('plug-in dir:{0}'.format(self.plugins_path))
+            os.environ['MAYA_PLUG_IN_PATH'] += r';{0}'.format(self.plugins_path)
+        
+
+        maya.cmds.loadPlugin('fspy_plugin')
+        maya.cmds.pluginInfo('fspy_plugin',  edit=True, autoload=True)
+
+        
+
+    def post_install(self, install_succeeded):
+        #build the mod file
+        success = super().post_install(install_succeeded)        
+        
+        if not success:
+            return success
+        
+        if not install_succeeded:
+            #if the install didn't complete then we don't want to do anything else
+            return True
+        
+        try:
+            self._add_fspy_plugin()
+        except:
+            maya.cmds.error("Fspy plug-in failed to install properly")
+            success = False
+
+        #move the user setup
+        scripts_dir: pathlib.Path = pathlib.Path(self.scripts_path)
+        setup_file = scripts_dir.joinpath('cg3dmaya/userSetup.py')
+        dest = scripts_dir.joinpath(setup_file.name)
+        if dest.exists():
+            dest.unlink()
+            
+        shutil.copyfile(setup_file, dest)
+
+        #build the menu
+        import cg3dmaya.userSetup
+        cg3dmaya.userSetup.guru_setup()
 
 
 def main():
@@ -1042,10 +1106,10 @@ def main():
         MODULE_NAME = 'cg3dmaya'
         MODULE_VERSION = 1.0
         PACKAGE_NAME = MODULE_NAME
-        
-        manager = MyInstaller(MODULE_NAME, MODULE_VERSION, package_name = PACKAGE_NAME)
 
-        
+        manager = MyInstaller(MODULE_NAME, MODULE_VERSION, package_name=PACKAGE_NAME)
+
+
         Resources.company_base64 = '''''' #must be surrounded by three '.  Uses Resources.print_file_string to generate a string from an image filepath
         logo_size = [64, 64]
         background_color = '' #hex string
