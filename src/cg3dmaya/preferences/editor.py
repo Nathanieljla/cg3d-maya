@@ -1,5 +1,5 @@
 import os
-import cg3dguru
+import cg3dguru.ui
 import cg3dmaya.preferences
 
 class Cg3dMayaPrefs(cg3dguru.ui.Window):
