@@ -411,7 +411,8 @@ class ModuleManager(QThread):
             pip_args = [
                 #r'--user', 
                 #r'--editable=git+{0}#egg={1}'.format(github, self.repo_name), 
-                r'--target={0}'.format(self.scripts_path), 
+                r'--target={0}'.format(self.scripts_path),
+                r'--upgrade'
             ]
         Commandline.pip_install(package_name, pip_args)
     
