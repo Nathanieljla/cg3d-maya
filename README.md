@@ -1,3 +1,5 @@
+![maya2024](https://img.shields.io/badge/Maya2024-tested-brightgreen.svg)
+
 # cg3d-maya
 The best of my personal maya scripts for public consumption in an easy to use module.
 
