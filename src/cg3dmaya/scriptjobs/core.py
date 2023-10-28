@@ -20,7 +20,7 @@ def _check_projects(*args, **kwargs):
         result = pm.confirmDialog(title='3D CG Guru', message='Switch Projects and reload?', messageAlign='center', button=['Yes', 'No'], defaultButton='Yes', cancelButton='No', dismissString='No')
         if result == 'Yes':
             pm.mel.eval('workspace -o "{}"'.format(workspace_path))
-            pm.system.openFile(pm.system.sceneName())
+            pm.system.openFile(pm.system.sceneName(), force=True)
 
 
 def register_project_switch(register: bool | None = None):
