@@ -131,3 +131,4 @@ src/cg3dmaya/tests/
 # Pyre type checker
 .pyre/
 *.wpu
+src/cg3dmaya/install_pymel.py
