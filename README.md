@@ -3,6 +3,13 @@
 # cg3d-maya
 The best of my personal maya scripts for public consumption in an easy to use module.
 
+### Current Features
+1. Menu to connect to the wing-ide
+2. Automatically detect when you're loading a Maya file from another project and ask if you'd like to auto-switch projects and reload.
+3. Note for tech artists: My cg3guru package gets installed.  Checkout the udata class for creating attributes with versioning.
+
+
+
 # Installation
 
 ### Drag & Drop
