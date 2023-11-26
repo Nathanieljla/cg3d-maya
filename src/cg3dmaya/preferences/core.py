@@ -1,4 +1,4 @@
-
+import pymel.core as pm
 import enum
 import pathlib
 import pickle
@@ -6,7 +6,7 @@ import pickle
 _PREFS_INSTANCE = None
 
 
-class CallbackEnum(enum.Enum):
+class OptionEnum(enum.Enum):
     NEVER = 'Never'
     ALWAYS = 'Always'
     ASK = 'Ask'
@@ -14,8 +14,8 @@ class CallbackEnum(enum.Enum):
 
 class _PreferenceData(object):
     def __init__(self):
-        self.callback_switch_project = CallbackEnum.NEVER
-        self.callback_fbx_namespaces = CallbackEnum.NEVER
+        self.callback_switch_project = OptionEnum.NEVER
+        self.callback_fbx_namespaces = OptionEnum.NEVER
         
 
 def _get_save_path():
@@ -39,9 +39,13 @@ def get():
 
     saved_data = _get_save_path()
     if saved_data.exists():
-        file = open(saved_data, 'rb')
-        _PREFS_INSTANCE = pickle.load(file)
-        file.close()
+        try:       
+            file = open(saved_data, 'rb')
+            _PREFS_INSTANCE = pickle.load(file)
+            file.close()
+        except:
+            pm.warning("3D CG Maya: Preferences are reset due to corrupt data")
+            set(_PreferenceData())
     else:
         set(_PreferenceData())
         

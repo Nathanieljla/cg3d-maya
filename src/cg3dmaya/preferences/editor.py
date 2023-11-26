@@ -33,8 +33,8 @@ class Cg3dMayaPrefs(cg3dguru.ui.Window):
         
         
     def save_prefs(self, *args, **kwargs):
-        self.prefs.callback_switch_project = cg3dmaya.preferences.CallbackEnum(self.ui.switch_pref.currentText())
-        self.prefs.callback_fbx_namespaces = cg3dmaya.preferences.CallbackEnum(self.ui.fbx_namespace_pref.currentText())
+        self.prefs.callback_switch_project = cg3dmaya.preferences.OptionEnum(self.ui.switch_pref.currentText())
+        self.prefs.callback_fbx_namespaces = cg3dmaya.preferences.OptionEnum(self.ui.fbx_namespace_pref.currentText())
         cg3dmaya.preferences.set(self.prefs)
         self.ui.close()
 

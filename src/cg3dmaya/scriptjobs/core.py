@@ -51,8 +51,8 @@ def before_file_check(*args, **kwargs):
 
     try:
         prefs = cg3dmaya.preferences.get()
-        if prefs.callback_switch_project != cg3dmaya.preferences.CallbackEnum.NEVER:
-            _check_project(prefs.callback_switch_project == cg3dmaya.preferences.CallbackEnum.ASK, target_path=file_object.rawFullName())
+        if prefs.callback_switch_project != cg3dmaya.preferences.OptionEnum.NEVER:
+            _check_project(prefs.callback_switch_project == cg3dmaya.preferences.OptionEnum.ASK, target_path=file_object.rawFullName())
     except Exception as e:
         pm.error('Project swith errored:{}'.format(e))
 
@@ -61,8 +61,8 @@ def before_file_check(*args, **kwargs):
 
 def after_save(*args, **kwargs):
     prefs = cg3dmaya.preferences.get()
-    if prefs.callback_switch_project != cg3dmaya.preferences.CallbackEnum.NEVER:
-        _check_project(prefs.callback_switch_project == cg3dmaya.preferences.CallbackEnum.ASK)
+    if prefs.callback_switch_project != cg3dmaya.preferences.OptionEnum.NEVER:
+        _check_project(prefs.callback_switch_project == cg3dmaya.preferences.OptionEnum.ASK)
 
 
 CHECK_FILE_ID = om.MSceneMessage.addCheckFileCallback(om.MSceneMessage.kBeforeOpenCheck, before_file_check)
@@ -92,18 +92,18 @@ def after_export(*args, **kwargs):
     
     try:
         prefs = cg3dmaya.preferences.get()
-        if prefs.callback_fbx_namespaces == cg3dmaya.preferences.CallbackEnum.NEVER:
+        if prefs.callback_fbx_namespaces == cg3dmaya.preferences.OptionEnum.NEVER:
             return
         
         result = None
-        if prefs.callback_fbx_namespaces == cg3dmaya.preferences.CallbackEnum.ASK:
+        if prefs.callback_fbx_namespaces == cg3dmaya.preferences.OptionEnum.ASK:
             if pm.mel.eval('FBXExportInAscii -q') == 1:
                 result = pm.confirmDialog(title='3D CG Guru', message='Stripe Namespaces?', messageAlign='center', button=['Yes', 'No'], defaultButton='Yes', cancelButton='No', dismissString='No')
             else:
                 pm.confirmDialog(title='3D CG Guru', message="Can't remove namespace. FBX file type is Binary. Expected ASCII")
                 result = 'No'
                 
-        if prefs.callback_fbx_namespaces == cg3dmaya.preferences.CallbackEnum.ALWAYS:
+        if prefs.callback_fbx_namespaces == cg3dmaya.preferences.OptionEnum.ALWAYS:
             result = 'Yes'
             if pm.mel.eval('FBXExportInAscii -q') != 1:
                 result = None
