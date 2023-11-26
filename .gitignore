@@ -132,3 +132,4 @@ src/cg3dmaya/tests/
 .pyre/
 *.wpu
 src/cg3dmaya/install_pymel.py
+src/cg3dmaya/preferences/prefs.pickle
