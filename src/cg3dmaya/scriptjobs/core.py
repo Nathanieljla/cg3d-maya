@@ -22,13 +22,13 @@ def _check_project(ask, target_path=None):
         current_path = pm.system.sceneName()
 
     #startswith doesn't work for WindowsPath, but works for Path
-    #so convert to a string
-    if str(current_path).startswith(project_path):
+    #so convert to a string.  Also on windows network drives use
+    #backslashes
+    current_path_str = str(current_path).replace("\\", "/")
+    if current_path_str.startswith(project_path):
         return
 
     workspace_path = None
-    #samepath is what I want to use, but WindowsPath doesn't know it
-    #so I'm trying samefile
     while not current_path.samefile(current_path.parent):
         current_path = current_path.parent
         if current_path.joinpath('workspace.mel').exists():
