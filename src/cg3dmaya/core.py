@@ -169,7 +169,7 @@ class ShapeCloner():
     def _get_temp_transforms(transform_list):
         temp_transforms = pm.duplicate(transform_list)
         pm.parent(temp_transforms, world=True, absolute=True)
-        pm.makeIdentity(temp_transforms, apply=True, translate=False, rotate=False, scale=True)
+        pm.makeIdentity(temp_transforms, apply=True, translate=False, rotate=True, scale=True)
         
         return temp_transforms
         
@@ -194,7 +194,7 @@ class ShapeCloner():
             for i in temp_transforms:
                 temp_matrix = gutils.MatrixUtils.get_world_matrix(i)
                 adjusted_matrix = temp_matrix * ctrl_matrix.inverse()
-                gutils.MatrixUtils.set_world_matrix(i, adjusted_matrix)
+                gutils.MatrixUtils.set_world_matrix(i, adjusted_matrix, no_scale=True)
                 
             pm.makeIdentity(temp_transforms, apply=True, translate=True, rotate=True, scale=True)
             
