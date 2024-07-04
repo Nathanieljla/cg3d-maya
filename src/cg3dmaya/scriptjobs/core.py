@@ -148,22 +148,37 @@ def check_ref_version(ret_code, file_obj, client_data=None):
                 #then we'll use then source patch, else we'll use the highest patch.
                 highest_patch = sorted(minor_dict.keys())[-1]
                 matches_source = matches_source and target_minor == source_version[1]
-                taret_patch = source_version[2] if matches_source and not prefs.patch_update else highest_patch
-                target_file = minor_dict.get(taret_patch, "")
+                target_patch = source_version[2] if matches_source and not prefs.patch_update else highest_patch
+                target_file = minor_dict.get(target_patch, "")
                 if not target_file:
                     return
                 
-                target_version = (target_major, target_minor, taret_patch)
+                target_version = (target_major, target_minor, target_patch)
                 if target_version <= source_version:
                     return
+
+                delta = tuple([target_version[idx] - value for idx, value in enumerate(source_version)])
+
+                #If the new version is a major update
+                check = delta[0] > 0 and prefs.major_update == 2
                 
-                if prefs.major_update == 2 or prefs.minor_update == 2 or prefs.patch_update == 2:
+                #If the new version is a minor update
+                if delta[0] == 0 and delta[1] > 0 and prefs.minor_update == 2:
+                    check = True
+
+                #If thew new version is a patch update
+                if delta[0] == 0 and delta[1] == 0 and prefs.patch_update == 2:
+                    check = True
+
+                if check:
                     old_name = ref_path.name
                     new_name = pathlib.Path(target_file).name
                     
                     result = pm.confirmDialog(title='3D CG Guru', message=f"Update {old_name} with {new_name}", messageAlign='center', button=['Yes', 'No'], defaultButton='Yes', cancelButton='No', dismissString='No')
                     if result == 'Yes':
                         new_file = target_file
+                else:
+                    new_file = target_file
 
             if new_file:
                 file_obj.setRawFullName(new_file)

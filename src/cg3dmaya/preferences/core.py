@@ -16,7 +16,7 @@ class _PreferenceData(object):
     def __init__(self):
         self.callback_switch_project = OptionEnum.NEVER
         self.callback_fbx_namespaces = OptionEnum.NEVER
-        self.ref_expression = r"(?P<base_name>[\w]*([ |_]v?))(((?P<major>[\d]+).?)((?P<min>[\d]+).?)?((?P<patch>[\d]+))?)?"
+        self.ref_expression = r"(?P<base_name>[\w]*([ |_]v?))(((?P<major>[\d]+).?)((?P<minor>[\d]+).?)?((?P<patch>[\d]+))?)?"
         self.major_update = OptionEnum.NEVER
         self.minor_update = OptionEnum.NEVER
         self.patch_update = OptionEnum.NEVER

@@ -42,7 +42,8 @@ class Cg3dMayaPrefs(cg3dguru.ui.Window):
     def save_prefs(self, *args, **kwargs):
         self.prefs.callback_switch_project = cg_prefs.OptionEnum(self.ui.switch_pref.currentIndex())
         self.prefs.callback_fbx_namespaces = cg_prefs.OptionEnum(self.ui.fbx_namespace_pref.currentIndex())
-        
+
+        self.prefs.ref_expression = self.ui.reference_regex.toPlainText()
         self.prefs.major_update = cg_prefs.OptionEnum(self.ui.ref_update_major.currentIndex())
         self.prefs.minor_update = cg_prefs.OptionEnum(self.ui.ref_update_minor.currentIndex())
         self.prefs.patch_update = cg_prefs.OptionEnum(self.ui.ref_update_patch.currentIndex())
