@@ -21,5 +21,17 @@ proj.directory-list = [{'dirloc': loc('../../maya/modules/cg3dmaya/scripts/cg3dm
                         'filter': '*',
                         'include_hidden': False,
                         'recursive': True,
+                        'watch_for_changes': True},
+                       {'dirloc': loc('../../maya/2024/modules/syncsketch-1.3.1/scripts/syncsketchGUI'),
+                        'excludes': (),
+                        'filter': '*',
+                        'include_hidden': False,
+                        'recursive': True,
+                        'watch_for_changes': True},
+                       {'dirloc': loc('../../maya/modules/cg3dmaya/scripts/cg3dguru'),
+                        'excludes': (),
+                        'filter': '*',
+                        'include_hidden': False,
+                        'recursive': True,
                         'watch_for_changes': True}]
 proj.file-type = 'shared'

@@ -1,5 +1,6 @@
 
 import pathlib
+import re
 
 import pymel.core as pm
 import maya.OpenMaya as om
@@ -67,6 +68,115 @@ def after_save(*args, **kwargs):
 
 CHECK_FILE_ID = om.MSceneMessage.addCheckFileCallback(om.MSceneMessage.kBeforeOpenCheck, before_file_check)
 AFTER_SAVE_ID = om.MSceneMessage.addCallback(om.MSceneMessage.kAfterSave, after_save)
+
+
+###----------------------------------------
+#Update reference check
+###----------------------------------------
+def check_ref_version(ret_code, file_obj, client_data=None):
+    try:
+        prefs = prefs = cg3dmaya.preferences.get()
+        updates = prefs.major_update + prefs.minor_update + prefs.patch_update
+        if updates and prefs.ref_expression:
+            regex = re.compile(prefs.ref_expression)
+            source_fullpath = file_obj.rawFullName().replace("\\", "/").replace("//", "/")
+            ref_path = pathlib.Path(source_fullpath)
+            ref_dir = ref_path.parent
+
+            source_info = regex.search(ref_path.name).groupdict()
+            source_name = source_info.get("base_name", "")
+            major = 0 if not source_info.get("major") else source_info.get("major")
+            minor = 0 if not source_info.get("minor") else source_info.get("minor")
+            patch = 0 if not source_info.get("patch") else source_info.get("patch")
+            source_version = (int(major), int(minor), int(patch))
+
+            all_files = [str(f) for f in ref_dir.iterdir() if f.is_file()]
+            ref_versions = []
+            ref_files = {}
+
+            for file_path in all_files:
+                file = pathlib.Path(file_path)
+                file_pattern = regex.search(file.name)
+                if not file_pattern:
+                    continue
+
+                file_info = file_pattern.groupdict()
+                if file_info.get("base_name") != source_name:
+                    continue
+
+                major = 0 if not file_info.get("major") else file_info.get("major")
+                minor = 0 if not file_info.get("minor") else file_info.get("minor")
+                patch = 0 if not file_info.get("patch") else file_info.get("patch")
+
+                major, minor, patch = (int(major), int(minor), int(patch))
+                ref_versions.append((major, minor, patch))
+
+                major_files: dict = ref_files.setdefault(major, {})
+                minor_files: dict = major_files.setdefault(minor, {})
+                minor_files[patch] = file_path
+
+            if not ref_versions:
+                return
+
+            ref_versions.sort()
+            highest_version = ref_versions[-1]
+            if highest_version <= source_version:
+                return
+
+            new_file = None
+            if prefs.major_update == 1 and prefs.minor_update == 1 and prefs.patch_update == 1:
+                new_file = ref_files[highest_version[0]][highest_version[1]][highest_version[2]]
+                
+            else:
+                #Get the highest major value if allowed, else use the source's major value
+                target_major = source_version[0] if not prefs.major_update else highest_version[0]
+                major_dict = ref_files.get(target_major, {})
+                if not major_dict:
+                    return
+
+                #If we're using the sources major value and we're not allowed
+                #to upgrade minors, then we'll use the source minor, else
+                #we'll use the highest minor.
+                highest_minor = sorted(major_dict.keys())[-1]
+                matches_source = target_major == source_version[0]
+                target_minor = source_version[1] if matches_source and not prefs.minor_update else highest_minor
+                minor_dict = major_dict.get(target_minor, {})
+                if not minor_dict:
+                    return
+
+                #If we're using the sources major.minor and we're not allowed allowed to upgrade patches
+                #then we'll use then source patch, else we'll use the highest patch.
+                highest_patch = sorted(minor_dict.keys())[-1]
+                matches_source = matches_source and target_minor == source_version[1]
+                taret_patch = source_version[2] if matches_source and not prefs.patch_update else highest_patch
+                target_file = minor_dict.get(taret_patch, "")
+                if not target_file:
+                    return
+                
+                target_version = (target_major, target_minor, taret_patch)
+                if target_version <= source_version:
+                    return
+                
+                if prefs.major_update == 2 or prefs.minor_update == 2 or prefs.patch_update == 2:
+                    old_name = ref_path.name
+                    new_name = pathlib.Path(target_file).name
+                    
+                    result = pm.confirmDialog(title='3D CG Guru', message=f"Update {old_name} with {new_name}", messageAlign='center', button=['Yes', 'No'], defaultButton='Yes', cancelButton='No', dismissString='No')
+                    if result == 'Yes':
+                        new_file = target_file
+
+            if new_file:
+                file_obj.setRawFullName(new_file)
+
+    except Exception as e:
+        pm.error('Guru Reference update errored:{}'.format(e))
+
+    finally:
+        om.MScriptUtil.setBool(ret_code, True)
+
+
+CHECK_REF_ID = om.MSceneMessage.addCheckFileCallback(om.MSceneMessage.kBeforeLoadReferenceCheck, check_ref_version)
+
 
 
 ###----------------------------------------

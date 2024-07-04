@@ -6,17 +6,31 @@ import pickle
 _PREFS_INSTANCE = None
 
 
-class OptionEnum(enum.Enum):
-    NEVER = 'Never'
-    ALWAYS = 'Always'
-    ASK = 'Ask'
+class OptionEnum(enum.IntEnum):
+    NEVER = 0
+    ALWAYS = 1
+    ASK = 2
 
 
 class _PreferenceData(object):
     def __init__(self):
         self.callback_switch_project = OptionEnum.NEVER
         self.callback_fbx_namespaces = OptionEnum.NEVER
+        self.ref_expression = r"(?P<base_name>[\w]*([ |_]v?))(((?P<major>[\d]+).?)((?P<min>[\d]+).?)?((?P<patch>[\d]+))?)?"
+        self.major_update = OptionEnum.NEVER
+        self.minor_update = OptionEnum.NEVER
+        self.patch_update = OptionEnum.NEVER
         
+        
+    @staticmethod
+    def clone(other):
+        new_prefs = _PreferenceData()
+        for key, value in other.__dict__.items():
+            if key in new_prefs.__dict__:
+                new_prefs.__dict__[key] = value
+                
+        return new_prefs
+
 
 def _get_save_path():
     saved_data = pathlib.Path(__file__)
@@ -24,7 +38,6 @@ def _get_save_path():
     saved_data = saved_data.joinpath('prefs.pickle')
     
     return saved_data
-
 
 
 def new():
@@ -41,8 +54,9 @@ def get():
     if saved_data.exists():
         try:       
             file = open(saved_data, 'rb')
-            _PREFS_INSTANCE = pickle.load(file)
+            saved_prefs = pickle.load(file)
             file.close()
+            _PREFS_INSTANCE = _PreferenceData.clone(saved_prefs)
         except:
             pm.warning("3D CG Maya: Preferences are reset due to corrupt data")
             set(_PreferenceData())

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>286</width>
-    <height>314</height>
+    <width>315</width>
+    <height>348</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item>
      <widget class="QGroupBox" name="groupBox">
       <property name="title">
-       <string>File Callbacks</string>
+       <string>Save Load Export Actions</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0">
@@ -77,6 +77,140 @@
            <string>Ask</string>
           </property>
          </item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="title">
+       <string>Update Reference Actions</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="regex_label">
+         <property name="text">
+          <string>Regex  </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="ref_major_update">
+         <property name="text">
+          <string>Major  </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QComboBox" name="ref_update_major">
+         <item>
+          <property name="text">
+           <string>Never</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Always</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Ask</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="ref_minor_update">
+         <property name="text">
+          <string>Minor  </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QComboBox" name="ref_update_minor">
+         <item>
+          <property name="text">
+           <string>Never</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Always</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Ask</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLabel" name="ref_patch_update">
+         <property name="text">
+          <string>Patch  </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="QComboBox" name="ref_update_patch">
+         <item>
+          <property name="text">
+           <string>Never</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Always</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Ask</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="0" column="1" colspan="2">
+        <widget class="QTextEdit" name="reference_regex">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>18</height>
+          </size>
+         </property>
+         <property name="inputMethodHints">
+          <set>Qt::ImhNone</set>
+         </property>
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
         </widget>
        </item>
       </layout>
@@ -159,8 +293,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>286</width>
-     <height>18</height>
+     <width>315</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuEdit">

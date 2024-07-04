@@ -131,7 +131,7 @@ class GameExporter():
                 try:
                     pm.waitCursor(state=True)
                     print("Removing namespace:{}".format(filename))
-                    gutils.remove_namespaces(filename)
+                    gutils.remove_namespaces(filename, True)
                 except Exception as e:
                     pm.warning("Namespace Failed. Make sure it's an ascii file:{} {}".format(filename, e))
                 finally:
