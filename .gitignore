@@ -133,3 +133,4 @@ src/cg3dmaya/tests/
 *.wpu
 src/cg3dmaya/install_pymel.py
 src/cg3dmaya/preferences/prefs.pickle
+src/cg3dmaya/fbx_lib/
