@@ -16,7 +16,7 @@ import cg3dmaya.preferences
 
 def _check_project(ask, target_path=None):
     project_path = pm.mel.eval('workspace -q -rd')
-    
+
     if target_path:
         current_path = pathlib.Path(target_path)
     else:

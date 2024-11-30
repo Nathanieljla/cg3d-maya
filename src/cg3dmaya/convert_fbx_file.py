@@ -18,6 +18,29 @@ except Exception as e:
 """
 
 
+def _convert_fbx(filename, save_name):
+    from maya import cmds
+    cmds.loadPlugin("fbxmaya")
+    cmds.file(filename, prompt=False, i=True, importFrameRate=True, importTimeRange='override')
+
+    if save_name:
+        filename = save_name
+
+    import maya.mel as mm
+    mm.eval("FBXResetExport")
+    mm.eval(f'FBXExportBakeComplexAnimation -v false')
+    mm.eval(f'FBXExportBakeResampleAnimation -v false')
+    mm.eval(f'FBXExportSkins -v true')
+    mm.eval(f'FBXExportShapes -v true')
+    mm.eval(f'FBXExportConstraints -v false')
+    mm.eval(f'FBXExportInputConnections -v false')
+    mm.eval(f'FBXExportCameras -v false')
+    mm.eval(f'FBXExportLights -v false')
+    mm.eval(f'FBXExportInAscii -v false')
+    mm.eval(f'FBXExportAnimationOnly -v false')
+    mm.eval(f'FBXExport -f "{filename}"')
+    
+
 def fbx_ascii_to_binary(filename, save_name=''):
     initialized = False
     try:
@@ -25,37 +48,18 @@ def fbx_ascii_to_binary(filename, save_name=''):
         maya.standalone.initialize()
         initialized = True
     except:
-        pass
+        return False
 
     success = False
     try:
-        from maya import cmds
-        cmds.loadPlugin("fbxmaya")
-        cmds.file(filename, prompt=False, i=True, importFrameRate=True, importTimeRange='override')
-
-        if save_name:
-            filename = save_name
-            
-        import maya.mel as mm
-        mm.eval("FBXResetExport")
-        mm.eval(f'FBXExportBakeComplexAnimation -v false')
-        mm.eval(f'FBXExportBakeResampleAnimation -v false')
-        mm.eval(f'FBXExportSkins -v true')
-        mm.eval(f'FBXExportShapes -v true')
-        mm.eval(f'FBXExportConstraints -v false')
-        mm.eval(f'FBXExportInputConnections -v false')
-        mm.eval(f'FBXExportCameras -v false')
-        mm.eval(f'FBXExportLights -v false')
-        mm.eval(f'FBXExportInAscii -v false')
-        mm.eval(f'FBXExportAnimationOnly -v false')
-        mm.eval(f'FBXExport -f "{filename}"')
+        _convert_fbx(filename, save_name)
         success = True
         
     except Exception as e:
         print("crash")
         print(e)
         success = False
-    
+
     finally:
         if initialized:
             try:

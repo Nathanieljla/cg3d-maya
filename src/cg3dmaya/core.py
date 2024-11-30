@@ -4,6 +4,7 @@ import os
 
 import pymel.core as pm
 
+import cg3dmaya.convert_fbx_file
 import cg3dguru.utils as gutils
 
 
@@ -40,6 +41,22 @@ class GameExporter():
             file_stats[str(i)] = os.stat(i).st_mtime
             
         return file_stats
+    
+    
+    @staticmethod
+    def convert_ascii_to_binary(fbx_filename):
+        import cg3dguru.utils.drop_installer as di
+
+        mayapy, pip = di.Commandline.get_python_paths()
+        
+        converter_script = cg3dmaya.convert_fbx_file.__file__.replace("\\", "/")
+        fbx_filename = fbx_filename.replace("\\", "/")
+        save_filename = fbx_filename
+        try:
+            print(fbx_filename)
+            di.Commandline.run_shell_command(f"{mayapy} {converter_script} {fbx_filename} {save_filename}", converter_script)
+        except Exception as e:
+            print(e)        
 
     
     @staticmethod
@@ -134,6 +151,15 @@ class GameExporter():
                     gutils.remove_namespaces(filename, True)
                 except Exception as e:
                     pm.warning("Namespace Failed. Make sure it's an ascii file:{} {}".format(filename, e))
+                finally:
+                    pm.waitCursor(state=False)
+
+                try:
+                    pm.waitCursor(state=True)
+                    print("Converting ascii to binay")
+                    GameExporter.convert_ascii_to_binary(filename)
+                except Exception as e:
+                    pm.warning("FBX to binary Failed. Make sure it's an ascii file:{} {}".format(filename, e))
                 finally:
                     pm.waitCursor(state=False)
                     
