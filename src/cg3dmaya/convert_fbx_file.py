@@ -70,17 +70,6 @@ def fbx_ascii_to_binary(filename, save_name=''):
     return success
 
 
-#import cg3dguru.utils.drop_installer as di
-#mayapy, pip = di.Commandline.get_python_paths()
-
-#converter_script = r"C:/Users/natha/OneDrive/MATC/maya/modules/cg3dmaya/scripts/cg3dmaya/convert_fbx_file.py"
-#fbx_test = r"E:/UnityProjects/doomer@doomer_stand_slam_ascii.fbx"
-#save_test = r"E:/UnityProjects/doomer@doomer_stand_slam.fbx"
-#try:
-    #di.Commandline.run_shell_command(f"{mayapy} {converter_script} {fbx_test} {save_test}", converter_script)
-#except Exception as e:
-    #print(e)
-
 if __name__ == '__main__':
     import sys
     this_file = ""
