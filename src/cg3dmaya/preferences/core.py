@@ -16,10 +16,15 @@ class _PreferenceData(object):
     def __init__(self):
         self.callback_switch_project = OptionEnum.NEVER
         self.callback_fbx_namespaces = OptionEnum.NEVER
+        self.remove_subdeformer_namespaces = OptionEnum.NEVER
+        self.convert_fbx_to_binary = OptionEnum.NEVER
+        
         self.ref_expression = r"(?P<base_name>[\w]*([ |_]v?))(((?P<major>[\d]+).?)((?P<minor>[\d]+).?)?((?P<patch>[\d]+))?)?"
         self.major_update = OptionEnum.NEVER
         self.minor_update = OptionEnum.NEVER
         self.patch_update = OptionEnum.NEVER
+        
+        self.environment_variables = dict()
         
         
     @staticmethod
@@ -30,6 +35,21 @@ class _PreferenceData(object):
                 new_prefs.__dict__[key] = value
                 
         return new_prefs
+    
+    
+    @staticmethod
+    def use_option(option_value: OptionEnum, question) -> bool:
+        if option_value == OptionEnum.NEVER:
+            return False
+
+        elif option_value == OptionEnum.ALWAYS:
+            return True
+
+        elif option_value == OptionEnum.ASK:
+            result = pm.confirmDialog(title='3D CG Guru', message=question, messageAlign='center', button=['Yes', 'No'], defaultButton='Yes', cancelButton='No', dismissString='No')
+            return result == 'Yes'
+        else:
+            raise KeyError(f"OptionEnum value of {option_value} isn't supported in use_option")
 
 
 def _get_save_path():

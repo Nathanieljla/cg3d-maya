@@ -215,27 +215,42 @@ def after_export(*args, **kwargs):
     if FBX_PATH is None:
         return
     
-    try:
+    try:    
         prefs = cg3dmaya.preferences.get()
-        if prefs.callback_fbx_namespaces == cg3dmaya.preferences.OptionEnum.NEVER:
-            return
-        
-        result = None
-        if prefs.callback_fbx_namespaces == cg3dmaya.preferences.OptionEnum.ASK:
-            if pm.mel.eval('FBXExportInAscii -q') == 1:
-                result = pm.confirmDialog(title='3D CG Guru', message='Stripe Namespaces?', messageAlign='center', button=['Yes', 'No'], defaultButton='Yes', cancelButton='No', dismissString='No')
-            else:
-                pm.confirmDialog(title='3D CG Guru', message="Can't remove namespace. FBX file type is Binary. Expected ASCII")
-                result = 'No'
-                
-        if prefs.callback_fbx_namespaces == cg3dmaya.preferences.OptionEnum.ALWAYS:
-            result = 'Yes'
+        if prefs.use_option(prefs.callback_fbx_namespaces, "Stripe Namespaces?"):
             if pm.mel.eval('FBXExportInAscii -q') != 1:
-                result = None
+                message = "Can't remove namespace. FBX file type is Binary. Expected ASCII."
+                
+                if prefs.callback_fbx_namespaces == cg3dmaya.preferences.OptionEnum.ALWAYS:
+                    pm.warning(message)
+                else:
+                    pm.confirmDialog(title='3D CG Guru', message="Can't remove namespace. FBX file type is Binary. Expected ASCII")
 
-        if result == 'Yes':
-            cg3dguru.utils.remove_namespaces(FBX_PATH)
-            pm.displayInfo("##---FBX Namespace removal complete---##")
+            else:
+                move_sub_deformers = prefs.use_option(prefs.remove_subdeformer_namespaces, "Remove Subdeformer Namespaces too?")
+                cg3dguru.utils.remove_namespaces(FBX_PATH, move_sub_deformers)
+                pm.displayInfo("##---FBX Namespace removal complete---##")                
+                
+            
+        #if prefs.callback_fbx_namespaces == cg3dmaya.preferences.OptionEnum.NEVER:
+            #return
+        
+        #result = None
+        #if prefs.callback_fbx_namespaces == cg3dmaya.preferences.OptionEnum.ASK:
+            #if pm.mel.eval('FBXExportInAscii -q') == 1:
+                #result = pm.confirmDialog(title='3D CG Guru', message='Stripe Namespaces?', messageAlign='center', button=['Yes', 'No'], defaultButton='Yes', cancelButton='No', dismissString='No')
+            #else:
+                #pm.confirmDialog(title='3D CG Guru', message="Can't remove namespace. FBX file type is Binary. Expected ASCII")
+                #result = 'No'
+
+        #if prefs.callback_fbx_namespaces == cg3dmaya.preferences.OptionEnum.ALWAYS:
+            #result = 'Yes'
+            #if pm.mel.eval('FBXExportInAscii -q') != 1:
+                #result = None
+
+        #if result == 'Yes':
+            #cg3dguru.utils.remove_namespaces(FBX_PATH)
+            #pm.displayInfo("##---FBX Namespace removal complete---##")
     except UnicodeDecodeError as e:
         pm.error('Removing namespace failed. Filetype must be ascii: {}'.format(e))
 

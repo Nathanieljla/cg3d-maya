@@ -7,6 +7,8 @@ import pymel.core as pm
 import cg3dmaya.convert_fbx_file
 import cg3dguru.utils as gutils
 
+import cg3dmaya.preferences
+
 
 class ExportType(Enum):
     MODEL = 'Model'
@@ -145,12 +147,16 @@ class GameExporter():
         namespaces = False
         binary = False
         
+        prefs = cg3dmaya.preferences.get()
+        remove_submorphers = prefs.use_option(prefs.remove_subdeformer_namespaces, "Remove Subdeformer Namespaces too?")
+        convert_binary = prefs.use_option(prefs.convert_fbx_to_binary, "Convert to Binary FBX File?")
+        
         for filename, value in post_file_stats.items():
             if filename not in pre_file_stats or value > pre_file_stats[filename]:
                 try:
                     pm.waitCursor(state=True)
                     print("Removing namespace: {}".format(filename))
-                    gutils.remove_namespaces(filename, True)
+                    gutils.remove_namespaces(filename, remove_submorphers)
                     namespaces = True
                     
                 except Exception as e:
@@ -159,10 +165,11 @@ class GameExporter():
                     pm.waitCursor(state=False)
 
                 try:
-                    pm.waitCursor(state=True)
-                    print("Converting ascii to binary")
-                    GameExporter.convert_ascii_to_binary(filename)
-                    binary = True
+                    if convert_binary:
+                        pm.waitCursor(state=True)
+                        print("Converting ascii to binary")
+                        GameExporter.convert_ascii_to_binary(filename)
+                        binary = True
                     
                 except Exception as e:
                     pm.warning("FBX to binary Failed. Make sure it's an ascii file:{} {}".format(filename, e))
