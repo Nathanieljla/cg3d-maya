@@ -1,7 +1,14 @@
+![maya2025](https://img.shields.io/badge/Maya2025-tested-brightgreen.svg)
 ![maya2024](https://img.shields.io/badge/Maya2024-tested-brightgreen.svg)
 
 # cg3d-maya
 The best of my personal maya scripts for public consumption in an easy to use module.
+
+## Version History
+1.0.0 
+- Users can now add an environment variable to their PC.  Then (from The Guru preferences) add the environment name.  This will replace hard-coded Game exporter paths with the path defined in the variable.
+- When an environment variable has been found, then you can optionally search for a change in the file location based on the environment variables path.  This allows you to restructure fbx files from Unity and have the data updated in Maya. Search behaviour is defined in the preferences "Search for new location" option.
+- ASCII files can be converted to binary files. Note: This starts a Maya instance behind the scenes, so it does take a moment to do the conversion.
 
 ### Current Features
 1. Menu to connect to the wing-ide
