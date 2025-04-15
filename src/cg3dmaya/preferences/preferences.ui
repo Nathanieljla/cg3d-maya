@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>315</width>
-    <height>348</height>
+    <width>552</width>
+    <height>733</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,204 +16,447 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QGroupBox" name="groupBox">
-      <property name="title">
-       <string>Save Load Export Actions</string>
+     <widget class="QToolBox" name="toolBox">
+      <property name="currentIndex">
+       <number>1</number>
       </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="switch_project_label">
-         <property name="text">
-          <string>Switch Projects   </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="fbx_namespace_pref">
-         <item>
-          <property name="text">
-           <string>Never</string>
+      <widget class="QWidget" name="save_loadexport_page">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>534</width>
+         <height>200</height>
+        </rect>
+       </property>
+       <attribute name="label">
+        <string>Save Load Export Actions</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QWidget" name="widget_3" native="true">
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="0" column="0">
+               <widget class="QLabel" name="switch_project_label">
+                <property name="text">
+                 <string>Switch Projects   </string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="switch_pref">
+                <item>
+                 <property name="text">
+                  <string>Never</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Always</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Ask</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Remove FBX Namespaces   </string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="fbx_namespace_pref">
+                <item>
+                 <property name="text">
+                  <string>Never</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Always</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Ask</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Always</string>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
           </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Ask</string>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="game_exporter_page">
+       <attribute name="label">
+        <string>Game Exporter + (Removed namespaces +)</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QGroupBox" name="groupBox_3">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QWidget" name="widget_2" native="true">
+             <layout class="QGridLayout" name="gridLayout_4">
+              <item row="1" column="1">
+               <widget class="QLabel" name="ge_fbx_deformer_label">
+                <property name="text">
+                 <string>Remove Deformer Namespace</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLabel" name="ge_fbx_binary_label">
+                <property name="text">
+                 <string>Convert to binary</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="2" column="2">
+               <widget class="QComboBox" name="ge_fbx_binary_choice">
+                <item>
+                 <property name="text">
+                  <string>Never</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Always</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Ask</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QComboBox" name="ge_fbx_deformer_choice">
+                <item>
+                 <property name="text">
+                  <string>Never</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Always</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Ask</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="ge_update_location_label">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="text">
+                 <string>Search For New Location</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="2">
+               <widget class="QComboBox" name="ge_update_location_choice">
+                <item>
+                 <property name="text">
+                  <string>Never</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Always</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Ask</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
-         </item>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Remove FBX Namespaces   </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="switch_pref">
-         <item>
-          <property name="text">
-           <string>Never</string>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
           </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Always</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Ask</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="title">
-       <string>Update Reference Actions</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <widget class="QLabel" name="regex_label">
-         <property name="text">
-          <string>Regex  </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="ref_major_update">
-         <property name="text">
-          <string>Major  </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QComboBox" name="ref_update_major">
-         <item>
-          <property name="text">
-           <string>Never</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Always</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Ask</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLabel" name="ref_minor_update">
-         <property name="text">
-          <string>Minor  </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2">
-        <widget class="QComboBox" name="ref_update_minor">
-         <item>
-          <property name="text">
-           <string>Never</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Always</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Ask</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLabel" name="ref_patch_update">
-         <property name="text">
-          <string>Patch  </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2">
-        <widget class="QComboBox" name="ref_update_patch">
-         <item>
-          <property name="text">
-           <string>Never</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Always</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Ask</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="0" column="1" colspan="2">
-        <widget class="QTextEdit" name="reference_regex">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>24</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>18</height>
-          </size>
-         </property>
-         <property name="inputMethodHints">
-          <set>Qt::ImhNone</set>
-         </property>
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-        </widget>
-       </item>
-      </layout>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="update_references_page">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>534</width>
+         <height>239</height>
+        </rect>
+       </property>
+       <attribute name="label">
+        <string>Update Reference Actions</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <widget class="QGroupBox" name="groupBox_2">
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Regular Expression</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTextEdit" name="reference_regex">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>18</height>
+              </size>
+             </property>
+             <property name="inputMethodHints">
+              <set>Qt::ImhNone</set>
+             </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="widget_5" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <spacer name="horizontalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QWidget" name="widget_4" native="true">
+                <layout class="QGridLayout" name="gridLayout">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="ref_major_update">
+                   <property name="text">
+                    <string>Major  </string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QComboBox" name="ref_update_major">
+                   <item>
+                    <property name="text">
+                     <string>Never</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Always</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Ask</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="ref_minor_update">
+                   <property name="text">
+                    <string>Minor  </string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QComboBox" name="ref_update_minor">
+                   <item>
+                    <property name="text">
+                     <string>Never</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Always</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Ask</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="ref_patch_update">
+                   <property name="text">
+                    <string>Patch  </string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QComboBox" name="ref_update_patch">
+                   <item>
+                    <property name="text">
+                     <string>Never</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Always</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Ask</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="Environment_variable_page">
+       <attribute name="label">
+        <string>Environment Variable Names</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QTextEdit" name="ev_name_values"/>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
     <item>
@@ -293,7 +536,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>315</width>
+     <width>552</width>
      <height>22</height>
     </rect>
    </property>

@@ -28,9 +28,22 @@ class Cg3dMayaPrefs(cg3dguru.ui.Window):
         self.ui.switch_pref.setCurrentIndex(prefs.callback_switch_project)
         
         
-        #idx = self.ui.fbx_namespace_pref.findText(prefs.callback_fbx_namespaces.value)
         self.ui.fbx_namespace_pref.setCurrentIndex(prefs.callback_fbx_namespaces)
+        
+        self.ui.ge_fbx_deformer_choice.setCurrentIndex(prefs.remove_subdeformer_namespaces)
+        self.ui.ge_fbx_binary_choice.setCurrentIndex(prefs.convert_fbx_to_binary)
+        self.ui.ge_update_location_choice.setCurrentIndex(prefs.search_for_new_location)
 
+        ev_values = list(prefs.environment_variables)
+        ev_values.sort()
+        ev_str = ''
+        for value in ev_values:
+            if not value:
+                continue
+            
+            ev_str += f"{value}\n"
+            
+        self.ui.ev_name_values.setText(ev_str)
         
         self.ui.reference_regex.setPlainText(prefs.ref_expression)
         self.ui.ref_update_major.setCurrentIndex(prefs.major_update)
@@ -43,12 +56,24 @@ class Cg3dMayaPrefs(cg3dguru.ui.Window):
         self.prefs.callback_switch_project = cg_prefs.OptionEnum(self.ui.switch_pref.currentIndex())
         self.prefs.callback_fbx_namespaces = cg_prefs.OptionEnum(self.ui.fbx_namespace_pref.currentIndex())
 
+        self.prefs.remove_subdeformer_namespaces = cg_prefs.OptionEnum(self.ui.ge_fbx_deformer_choice.currentIndex())
+        self.prefs.convert_fbx_to_binary = cg_prefs.OptionEnum(self.ui.ge_fbx_binary_choice.currentIndex())
+        self.prefs.search_for_new_location = cg_prefs.OptionEnum(self.ui.ge_update_location_choice.currentIndex())
+
+        ev_values = set()
+        for name in self.ui.ev_name_values.toPlainText().split('\n'):
+            name = name.strip()
+            if name:
+                ev_values.add(name.strip())
+            
+        self.prefs.environment_variables = ev_values
+
         self.prefs.ref_expression = self.ui.reference_regex.toPlainText()
         self.prefs.major_update = cg_prefs.OptionEnum(self.ui.ref_update_major.currentIndex())
         self.prefs.minor_update = cg_prefs.OptionEnum(self.ui.ref_update_minor.currentIndex())
         self.prefs.patch_update = cg_prefs.OptionEnum(self.ui.ref_update_patch.currentIndex())
         
-        cg_prefs.set(self.prefs)
+        cg_prefs.set_prefs(self.prefs)
         self.ui.close()
 
     def cancel(self, *args, **kwargs):

@@ -14,17 +14,22 @@ class OptionEnum(enum.IntEnum):
 
 class _PreferenceData(object):
     def __init__(self):
+        #-Callbacks
         self.callback_switch_project = OptionEnum.NEVER
         self.callback_fbx_namespaces = OptionEnum.NEVER
+
+        #--Game export + options
         self.remove_subdeformer_namespaces = OptionEnum.NEVER
         self.convert_fbx_to_binary = OptionEnum.NEVER
-        
+        self.search_for_new_location = OptionEnum.NEVER
+
+        #-Reference Update
         self.ref_expression = r"(?P<base_name>[\w]*([ |_]v?))(((?P<major>[\d]+).?)((?P<minor>[\d]+).?)?((?P<patch>[\d]+))?)?"
         self.major_update = OptionEnum.NEVER
         self.minor_update = OptionEnum.NEVER
         self.patch_update = OptionEnum.NEVER
         
-        self.environment_variables = dict()
+        self.environment_variables = set()
         
         
     @staticmethod
@@ -79,14 +84,14 @@ def get():
             _PREFS_INSTANCE = _PreferenceData.clone(saved_prefs)
         except:
             pm.warning("3D CG Maya: Preferences are reset due to corrupt data")
-            set(_PreferenceData())
+            set_prefs(_PreferenceData())
     else:
-        set(_PreferenceData())
+        set_prefs(_PreferenceData())
         
     return _PREFS_INSTANCE
         
 
-def set(data: _PreferenceData):
+def set_prefs(data: _PreferenceData):
     global _PREFS_INSTANCE
     _PREFS_INSTANCE = data
     saved_data = _get_save_path()

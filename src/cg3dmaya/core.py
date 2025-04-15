@@ -8,6 +8,7 @@ import cg3dmaya.convert_fbx_file
 import cg3dguru.utils as gutils
 
 import cg3dmaya.preferences
+import cg3dmaya.paths
 
 
 class ExportType(Enum):
@@ -60,8 +61,9 @@ class GameExporter():
             print(e)        
 
     
+
     @staticmethod
-    def export(tab: ExportType):
+    def _export(tab: ExportType):
         if not pm.pluginInfo(GameExporter.PLUGIN_NAME, q=True, loaded=True):
             try:
                 pm.loadPlugin(GameExporter.PLUGIN_NAME)
@@ -136,7 +138,7 @@ class GameExporter():
         pm.mel.eval('gameExp_DoExport')
         
         if not export_path:
-            #Mayeb our path is valid from the export projcess?
+            #Maybe our path is valid from the export process?
             export_path = GameExporter._get_export_path(export_path_str)
 
         if not export_path:
@@ -174,10 +176,139 @@ class GameExporter():
                 except Exception as e:
                     pm.warning("FBX to binary Failed. Make sure it's an ascii file:{} {}".format(filename, e))
                 finally:
-                    pm.waitCursor(state=False)
+                    if pm.waitCursor(state=False, query=True):
+                        pm.waitCursor(state=False)
                     
                     
         pm.displayInfo(f"Namespaces removed: {namespaces}. Converted to Binary: {binary}.")
+        
+        
+    @staticmethod
+    def sync_paths(file_root, exporter):
+        prefs = cg3dmaya.preferences.get()
+        if prefs.search_for_new_location == cg3dmaya.preferences.OptionEnum.NEVER:
+            return
+        
+        filenames = set()
+        #1 = mesh export, #2 = Animation Export, #3 = Time Editor export
+        if exporter.exportTypeIndex.get() != 2:
+            filenames.add(f"{exporter.exportFilename.get()}.fbx")
+            
+        else:
+            prefix = exporter.exportFilename.get()
+            for anim in exporter.animClips:
+                if not anim.exportAnimClip.get():
+                    continue
+
+                name = anim.animClipName.get()
+                filenames.add(
+                    f"{prefix}{name}.fbx"
+                )
+                
+
+        file_paths = dict()
+        duplicates_found = set()
+        def list_all_files(directory):
+            nonlocal file_paths
+            
+            """Lists all files in the given directory and its subdirectories."""
+            for root, dirs, files in os.walk(directory):
+                for file in files:
+                    file = file.lower()
+                    
+                    if not file.endswith('fbx'):
+                        continue
+                    
+                    if file in file_paths:
+                        duplicates_found.add(file)
+                    else:
+                        file_paths[file] = os.path.join(root)
+                    
+
+        list_all_files(file_root)
+        new_paths = set()
+        for filename in filenames:
+            filename = filename.lower()
+            
+            if filename in file_paths:
+                new_paths.add(
+                    file_paths[filename].replace("\\", "/")
+                )
+                
+        new_paths = list(new_paths)
+        if not len(new_paths):
+            return
+        
+        if len(new_paths) > 1 or duplicates_found:
+            pm.warning(f"Too many paths exist to update location. See console for more details.")
+            if len(new_paths) > 1:
+                print(f"\nExport data now exists at:\n{new_paths}\n")
+            if duplicates_found:
+                print(f"\nThere are multipe files of the same name. The duplicate names are:\n{duplicates_found}\n")
+                
+            return
+        else:
+            new_path =new_paths[0].replace("\\", "/")
+            if prefs.use_option(prefs.search_for_new_location, f"Update file location to:\n{new_path}"):
+                exporter.exportPath.set(new_path)
+
+
+
+    @staticmethod
+    def get_export_node(export_type: ExportType):
+        game_exporters = pm.ls(type='gameFbxExporter')
+        for exporter in game_exporters:
+            if export_type == ExportType.MODEL and exporter.exportTypeIndex.get() == 1:
+                return exporter
+            elif export_type == ExportType.ANIMATION and exporter.exportTypeIndex.get() == 2:
+                return exporter
+            elif export_type == ExportType.TIME_EDITOR and exporter.exportTypeIndex.get() == 3:
+                return exporter
+            
+        #this shouldn't be possible
+        return None
+
+ 
+
+    @staticmethod
+    def replace_env_paths(exporter):
+        env_path = exporter.exportPath.get()
+        if not env_path:
+            continue
+        
+        path, root = cg3dmaya.paths.env_path_to_path(env_path)
+        if root:
+            exporter.exportPath.set(path)
+
+        return root
+
+    
+
+    @staticmethod
+    def add_env_paths():
+        game_exporters = pm.ls(type='gameFbxExporter')
+        for exporter in game_exporters:
+            path = exporter.exportPath.get()
+            if not path:
+                continue
+            
+            env_path = cg3dmaya.paths.path_to_env_path(path)
+            exporter.exportPath.set(env_path)
+
+        
+    @staticmethod
+    def export(export_type: ExportType):
+        try:
+            exporter = GameExporter.get_export_node(export_type)
+            root = GameExporter.replace_env_paths(exporter)
+            if root:
+                GameExporter.sync_paths(root, exporter)
+                
+            GameExporter._export(export_type)
+        except Exception as e:
+            pm.warning(e)
+        finally:
+            GameExporter.add_env_paths()
 
 
     @staticmethod
@@ -193,8 +324,6 @@ class GameExporter():
         GameExporter.export(ExportType.TIME_EDITOR)
         
 
-
-        
 
         
 class ShapeCloner():
