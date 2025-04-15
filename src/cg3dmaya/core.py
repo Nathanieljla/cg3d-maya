@@ -274,7 +274,7 @@ class GameExporter():
     def replace_env_paths(exporter):
         env_path = exporter.exportPath.get()
         if not env_path:
-            continue
+            return
         
         path, root = cg3dmaya.paths.env_path_to_path(env_path)
         if root:
@@ -285,30 +285,36 @@ class GameExporter():
     
 
     @staticmethod
-    def add_env_paths():
-        game_exporters = pm.ls(type='gameFbxExporter')
-        for exporter in game_exporters:
-            path = exporter.exportPath.get()
-            if not path:
-                continue
-            
-            env_path = cg3dmaya.paths.path_to_env_path(path)
-            exporter.exportPath.set(env_path)
+    def add_env_paths(exporter):
+        path = exporter.exportPath.get()
+        if not path:
+            return
+        
+        env_path = cg3dmaya.paths.path_to_env_path(path)
+        exporter.exportPath.set(env_path)
 
         
     @staticmethod
     def export(export_type: ExportType):
+        exporter = GameExporter.get_export_node(export_type)
+        if not exporter:
+            pm.warning("No game export data found!  Please setup the game exporter.")
+            return
+        
         try:
-            exporter = GameExporter.get_export_node(export_type)
             root = GameExporter.replace_env_paths(exporter)
             if root:
                 GameExporter.sync_paths(root, exporter)
-                
+                #only do this if we're dealing with paths that are relative
+                #to a project environment variable, otherwise you might start
+                #creating folder from other people's harddrive paths
+                pathlib.Path(exporter.exportPath.get()).mkdir(parents=True, exist_ok=True)
+
             GameExporter._export(export_type)
         except Exception as e:
             pm.warning(e)
         finally:
-            GameExporter.add_env_paths()
+            GameExporter.add_env_paths(exporter)
 
 
     @staticmethod
