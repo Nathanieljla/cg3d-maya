@@ -83,7 +83,11 @@ def check_ref_version(ret_code, file_obj, client_data=None):
             ref_path = pathlib.Path(source_fullpath)
             ref_dir = ref_path.parent
 
-            source_info = regex.search(ref_path.name).groupdict()
+            source_info = regex.search(ref_path.name)
+            if not source_info:
+                return
+            
+            source_info = source_info.groupdict()
             source_name = source_info.get("base_name", "")
             major = 0 if not source_info.get("major") else source_info.get("major")
             minor = 0 if not source_info.get("minor") else source_info.get("minor")
