@@ -10,7 +10,7 @@ def guru_setup():
 
         print("Guru: registering script jobs!")
         import cg3dmaya.scriptjobs
-        cg3dmaya.scriptjobs.register_project_switch()
+
     except Exception as e:
         import traceback
         from pathlib import Path        

@@ -4,6 +4,7 @@ PARAMS = {
 }
 
 ORDER = [
+    'gameexporter',
     'techart',
     'preferences'
 ]

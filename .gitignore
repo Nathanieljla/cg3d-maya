@@ -131,4 +131,6 @@ src/cg3dmaya/tests/
 # Pyre type checker
 .pyre/
 *.wpu
-*.pickle
+src/cg3dmaya/install_pymel.py
+src/cg3dmaya/preferences/prefs.pickle
+src/cg3dmaya/fbx_lib/
