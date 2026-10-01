@@ -20,7 +20,6 @@ class ExportType(Enum):
     TIME_EDITOR = 'Time_editor'
 
 
-
 class GameExporter():
     PLUGIN_NAME = 'gameFbxExporter'
     

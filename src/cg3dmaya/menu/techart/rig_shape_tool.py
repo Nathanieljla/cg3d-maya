@@ -2,6 +2,7 @@ PARAMS = {
     'label': 'Rig Shape(s) Tool'
 }
 
+DIVIDER = ''
 
 def command(*args, **kwargs):
     import cg3dmaya.uis.rig_shape_editor
