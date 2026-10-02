@@ -1,11 +1,11 @@
 import os
 import cg3dguru.ui
-import cg3dmaya_v2.preferences as cg_prefs
+import cg3dmaya.preferences as cg_prefs
 
 class Cg3dMayaPrefs(cg3dguru.ui.Window):
     def __init__(self): 
         uiFilepath = os.path.join(cg_prefs.__path__[0], 'preferences.ui')
-        super(Cg3dMayaPrefs, self).__init__('cg3dmaya_v2_prefs', uiFilepath) #, custom_widgets = custom_widgets)
+        super(Cg3dMayaPrefs, self).__init__('cg3dmaya_prefs', uiFilepath) #, custom_widgets = custom_widgets)
 
         self.prefs = None
         self.init_ui()

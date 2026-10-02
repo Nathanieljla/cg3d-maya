@@ -7,7 +7,7 @@ import maya.OpenMaya as om
 
 
 import cg3dguru.utils
-import cg3dmaya_v2.preferences
+import cg3dmaya.preferences
 
 
 ###----------------------------------------
@@ -51,9 +51,9 @@ def before_file_check(*args, **kwargs):
     file_object = args[1]
 
     try:
-        prefs = cg3dmaya_v2.preferences.get()
-        if prefs.callback_switch_project != cg3dmaya_v2.preferences.OptionEnum.NEVER:
-            _check_project(prefs.callback_switch_project == cg3dmaya_v2.preferences.OptionEnum.ASK, target_path=file_object.rawFullName())
+        prefs = cg3dmaya.preferences.get()
+        if prefs.callback_switch_project != cg3dmaya.preferences.OptionEnum.NEVER:
+            _check_project(prefs.callback_switch_project == cg3dmaya.preferences.OptionEnum.ASK, target_path=file_object.rawFullName())
     except Exception as e:
         cmds.error('Project switch errored:{}'.format(e))
 
@@ -61,9 +61,9 @@ def before_file_check(*args, **kwargs):
 
 
 def after_save(*args, **kwargs):
-    prefs = cg3dmaya_v2.preferences.get()
-    if prefs.callback_switch_project != cg3dmaya_v2.preferences.OptionEnum.NEVER:
-        _check_project(prefs.callback_switch_project == cg3dmaya_v2.preferences.OptionEnum.ASK)
+    prefs = cg3dmaya.preferences.get()
+    if prefs.callback_switch_project != cg3dmaya.preferences.OptionEnum.NEVER:
+        _check_project(prefs.callback_switch_project == cg3dmaya.preferences.OptionEnum.ASK)
 
 
 CHECK_FILE_ID = om.MSceneMessage.addCheckFileCallback(om.MSceneMessage.kBeforeOpenCheck, before_file_check)
@@ -75,7 +75,7 @@ AFTER_SAVE_ID = om.MSceneMessage.addCallback(om.MSceneMessage.kAfterSave, after_
 ###----------------------------------------
 def check_ref_version(ret_code, file_obj, client_data=None):
     try:
-        prefs = cg3dmaya_v2.preferences.get()
+        prefs = cg3dmaya.preferences.get()
         updates = prefs.major_update + prefs.minor_update + prefs.patch_update
         if updates and prefs.ref_expression:
             regex = re.compile(prefs.ref_expression)
@@ -220,12 +220,12 @@ def after_export(*args, **kwargs):
         return
     
     try:    
-        prefs = cg3dmaya_v2.preferences.get()
+        prefs = cg3dmaya.preferences.get()
         if prefs.use_option(prefs.callback_fbx_namespaces, "Stripe Namespaces?"):
             if mel.eval('FBXExportInAscii -q') != 1:
                 message = "Can't remove namespace. FBX file type is Binary. Expected ASCII."
                 
-                if prefs.callback_fbx_namespaces == cg3dmaya_v2.preferences.OptionEnum.ALWAYS:
+                if prefs.callback_fbx_namespaces == cg3dmaya.preferences.OptionEnum.ALWAYS:
                     cmds.warning(message)
                 else:
                     cmds.confirmDialog(title='3D CG Guru', message="Can't remove namespace. FBX file type is Binary. Expected ASCII")

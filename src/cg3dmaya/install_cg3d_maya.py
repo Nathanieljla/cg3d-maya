@@ -1088,7 +1088,7 @@ class MyInstaller(ModuleManager):
 
         #move the user setup
         scripts_dir: pathlib.Path = pathlib.Path(self.scripts_path)
-        setup_file = scripts_dir.joinpath('cg3dmaya_v2/userSetup.py')
+        setup_file = scripts_dir.joinpath('cg3dmaya/userSetup.py')
         dest = scripts_dir.joinpath(setup_file.name)
         if dest.exists():
             dest.unlink()
@@ -1096,13 +1096,13 @@ class MyInstaller(ModuleManager):
         shutil.copyfile(setup_file, dest)
 
         #build the menu
-        import cg3dmaya_v2.userSetup
-        cg3dmaya_v2.userSetup.guru_setup()
+        import cg3dmaya.userSetup
+        cg3dmaya.userSetup.guru_setup()
 
 
 def main():
     if MAYA_RUNNING:
-        MODULE_NAME = 'cg3dmaya_v2'
+        MODULE_NAME = 'cg3dmaya'
         MODULE_VERSION = 2.0
         PACKAGE_NAME = MODULE_NAME
 

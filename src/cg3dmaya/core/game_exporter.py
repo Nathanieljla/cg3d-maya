@@ -8,9 +8,9 @@ from maya import cmds, mel
 from maya.api import OpenMaya as om
 
 import cg3dguru.utils as gutils
-import cg3dmaya_v2.core.convert_fbx_file
-import cg3dmaya_v2.core.paths
-import cg3dmaya_v2.preferences
+import cg3dmaya.core.convert_fbx_file
+import cg3dmaya.core.paths
+import cg3dmaya.preferences
 
 
 class ExportType(Enum):
@@ -44,7 +44,7 @@ class GameExporter:
         import cg3dguru.utils.drop_installer as installer
 
         mayapy, _ = installer.Commandline.get_python_paths()
-        converter_script = cg3dmaya_v2.core.convert_fbx_file.__file__.replace("\\", "/")
+        converter_script = cg3dmaya.core.convert_fbx_file.__file__.replace("\\", "/")
         fbx_filename = fbx_filename.replace("\\", "/")
         command = '"{}" "{}" "{}" "{}"'.format(
             mayapy, converter_script, fbx_filename, fbx_filename
@@ -130,7 +130,7 @@ class GameExporter:
         post_file_stats = GameExporter._get_file_stats(export_path)
         namespaces_removed = False
         converted_to_binary = False
-        prefs = cg3dmaya_v2.preferences.get()
+        prefs = cg3dmaya.preferences.get()
         remove_subdeformers = prefs.use_option(
             prefs.remove_subdeformer_namespaces,
             "Remove Subdeformer Namespaces too?",
@@ -181,8 +181,8 @@ class GameExporter:
 
     @staticmethod
     def sync_paths(file_root, exporter):
-        prefs = cg3dmaya_v2.preferences.get()
-        if prefs.search_for_new_location == cg3dmaya_v2.preferences.OptionEnum.NEVER:
+        prefs = cg3dmaya.preferences.get()
+        if prefs.search_for_new_location == cg3dmaya.preferences.OptionEnum.NEVER:
             return
 
         filenames = set()
@@ -257,7 +257,7 @@ class GameExporter:
         env_path = cmds.getAttr(_plug(exporter, "exportPath"))
         if not env_path:
             return None
-        path, root = cg3dmaya_v2.core.paths.env_path_to_path(env_path)
+        path, root = cg3dmaya.core.paths.env_path_to_path(env_path)
         if root:
             cmds.setAttr(_plug(exporter, "exportPath"), path, type="string")
         return root
@@ -267,7 +267,7 @@ class GameExporter:
         path = cmds.getAttr(_plug(exporter, "exportPath"))
         if not path:
             return
-        env_path = cg3dmaya_v2.core.paths.path_to_env_path(path)
+        env_path = cg3dmaya.core.paths.path_to_env_path(path)
         cmds.setAttr(_plug(exporter, "exportPath"), env_path, type="string")
 
     @staticmethod

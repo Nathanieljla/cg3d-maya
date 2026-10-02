@@ -1,13 +1,13 @@
 import os
-import cg3dmaya_v2
+import cg3dmaya
 import cg3dguru.ui
-import cg3dmaya_v2.core
+import cg3dmaya.core
 from maya import cmds
 
 
 class RigShapeEditor(cg3dguru.ui.Window):
    def __init__(self):
-      uiFilepath = os.path.join(cg3dmaya_v2.__path__[0], 'uis', 'rig_shapes.ui')
+      uiFilepath = os.path.join(cg3dmaya.__path__[0], 'uis', 'rig_shapes.ui')
       super(RigShapeEditor, self).__init__('rig_shapes', uiFilepath)
       
       self.ui.move_shapes.pressed.connect(lambda: self.action(True))
@@ -16,7 +16,7 @@ class RigShapeEditor(cg3dguru.ui.Window):
 
    def action(self, only_match):
       try:
-         cg3dmaya_v2.core.ShapeCloner.run(only_match=only_match)
+         cg3dmaya.core.ShapeCloner.run(only_match=only_match)
       except Exception as e:
          cmds.confirmDialog(title='Rig Shape Tool: Error', message=str(e), messageAlign='center')
 

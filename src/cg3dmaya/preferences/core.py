@@ -59,7 +59,7 @@ class _PreferenceData(object):
 
 def _get_save_path():
     preferences_dir = pathlib.Path(cmds.internalVar(userPrefDir=True)).joinpath(
-        'cg3dmaya_v2'
+        'cg3dmaya'
     )
     preferences_dir.mkdir(parents=True, exist_ok=True)
     return preferences_dir.joinpath('prefs.pickle')

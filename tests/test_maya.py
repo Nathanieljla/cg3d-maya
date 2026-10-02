@@ -29,7 +29,7 @@ class MayaV2Tests(unittest.TestCase):
 
         cmds.file(new=True, force=True)
 
-        import cg3dmaya_v2.preferences.core as preferences_core
+        import cg3dmaya.preferences.core as preferences_core
 
         self.preferences_core = preferences_core
         preferences_core._PREFS_INSTANCE = preferences_core.new()
@@ -38,7 +38,7 @@ class MayaV2Tests(unittest.TestCase):
         self.preferences_core._PREFS_INSTANCE = None
 
     def test_environment_paths_round_trip(self):
-        from cg3dmaya_v2.core import paths
+        from cg3dmaya.core import paths
 
         prefs = self.preferences_core.get()
         prefs.environment_variables = {"CG3D_MAYA_TEST_ROOT"}
@@ -61,7 +61,7 @@ class MayaV2Tests(unittest.TestCase):
     def test_game_exporter_node_and_path_sync(self):
         from maya import cmds
 
-        from cg3dmaya_v2.core.game_exporter import ExportType, GameExporter
+        from cg3dmaya.core.game_exporter import ExportType, GameExporter
 
         try:
             cmds.loadPlugin(GameExporter.PLUGIN_NAME, quiet=True)
@@ -111,7 +111,7 @@ class MayaV2Tests(unittest.TestCase):
     def test_shape_cloner_moves_curve_shape_to_joint(self):
         from maya import cmds
 
-        from cg3dmaya_v2.core.shape_cloner import ShapeCloner
+        from cg3dmaya.core.shape_cloner import ShapeCloner
 
         source = cmds.circle(name="source_ctrl", normal=(1, 0, 0))[0]
         cmds.select(clear=True)

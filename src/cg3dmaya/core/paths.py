@@ -5,7 +5,7 @@ import os
 from maya import cmds
 
 
-import cg3dmaya_v2.preferences
+import cg3dmaya.preferences
 
 
 _environment_exp = r"(?P<ENV>%(?P<ENV_NAME>\S+)%)?(?P<Path>\S*)"
@@ -39,7 +39,7 @@ def env_path_to_path(input_string):
 
 def path_to_env_path(input_string):
     environment_variables = os.environ
-    prefs = cg3dmaya_v2.preferences.get()
+    prefs = cg3dmaya.preferences.get()
     found_paths = dict()
     for ev_name in prefs.environment_variables:
         if ev_name in environment_variables:

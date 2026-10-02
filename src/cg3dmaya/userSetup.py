@@ -6,21 +6,21 @@ def guru_setup():
     try:    
         print("Guru: building Menu!")
         from cg3dguru.utils import menu_maker
-        menu_maker.run(menu_namespace='cg3dmaya_v2.menu')
+        menu_maker.run(menu_namespace='cg3dmaya.menu')
 
         print("Guru: registering script jobs!")
-        import cg3dmaya_v2.scriptjobs
+        import cg3dmaya.scriptjobs
 
     except Exception as e:
         import traceback
         from pathlib import Path        
         import maya.cmds as cmds
         
-        module_path = cmds.moduleInfo(path=True, moduleName='cg3dmaya_v2')
+        module_path = cmds.moduleInfo(path=True, moduleName='cg3dmaya')
         print("\n\n")
         print("--------------------------------------------------------")
         print(e)
-        log = Path(module_path).parent.joinpath('cg3dmaya_v2', 'scripts', 'error.log')
+        log = Path(module_path).parent.joinpath('cg3dmaya', 'scripts', 'error.log')
         callstack = traceback.format_exc()
         print(callstack)
         print("--------------------------------------------------------")
